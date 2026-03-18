@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Fresh Republic — Master Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Satoshi:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#07080b;--s1:#0e1018;--s2:#141720;--s3:#1b1f2b;--s4:#232838;
+  --b1:#252a3a;--b2:#2e3449;
+  --text:#f0f2ff;--t2:#8891b8;--t3:#4a5070;
+  --accent:#5b6cff;--a2:#7c8bff;--abg:rgba(91,108,255,0.1);
+  --green:#00e5a0;--gbg:rgba(0,229,160,0.08);
+  --red:#ff4d6a;--rbg:rgba(255,77,106,0.08);
+  --amber:#ffb830;--ambg:rgba(255,184,48,0.08);
+  --cyan:#00d4ff;--cbg:rgba(0,212,255,0.08);
+  --mono:'JetBrains Mono',monospace;--sans:'Satoshi',sans-serif;--display:'Syne',sans-serif;
+  --brand-accent:#5b6cff;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;display:flex;font-size:14px;}
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;z-index:1000;display:flex;align-items:stretch;}
+.ll{flex:1;background:var(--s1);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px;position:relative;overflow:hidden;}
+.ll-grid{position:absolute;inset:0;background-image:linear-gradient(var(--b1) 1px,transparent 1px),linear-gradient(90deg,var(--b1) 1px,transparent 1px);background-size:48px 48px;opacity:0.4;}
+.ll-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(91,108,255,0.1) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+.ll-brand{position:relative;z-index:1;text-align:center;margin-bottom:48px;}
+.ll-logo{font-family:var(--display);font-size:56px;font-weight:800;letter-spacing:-0.02em;line-height:1;}
+.ll-logo span{color:var(--accent);}
+.ll-sub{font-size:11px;color:var(--t3);letter-spacing:0.16em;text-transform:uppercase;margin-top:8px;}
+.ll-stats{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:420px;}
+.lsc{background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:18px;text-align:center;}
+.lsc-v{font-family:var(--display);font-size:28px;font-weight:700;color:var(--accent);}
+.lsc-l{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;margin-top:3px;}
+.lr{width:460px;background:var(--bg);display:flex;flex-direction:column;justify-content:center;padding:56px 48px;border-left:1px solid var(--b1);}
+.lr-title{font-family:var(--display);font-size:30px;font-weight:700;margin-bottom:6px;}
+.lr-sub{font-size:13px;color:var(--t2);margin-bottom:36px;}
+.role-row{display:flex;gap:8px;margin-bottom:24px;}
+.role-btn{flex:1;padding:9px;border-radius:8px;border:1px solid var(--b1);background:none;color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:center;}
+.role-btn.on{background:var(--abg);border-color:var(--accent);color:var(--a2);}
+.fg{margin-bottom:16px;}
+.fl{font-size:11px;color:var(--t2);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;display:block;margin-bottom:7px;}
+.fi{width:100%;background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:13px 15px;font-size:14px;color:var(--text);font-family:var(--sans);outline:none;transition:border-color 0.2s;}
+.fi:focus{border-color:var(--accent);}
+.fi::placeholder{color:var(--t3);}
+select.fi{cursor:pointer;}
+.btn-login{width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:15px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--display);letter-spacing:0.04em;transition:all 0.2s;margin-top:8px;}
+.btn-login:hover{background:var(--a2);transform:translateY(-1px);}
+.demo-box{margin-top:18px;background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:13px 15px;}
+.demo-label{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:7px;}
+.demo-row{font-family:var(--mono);font-size:11px;color:var(--t2);margin-bottom:3px;}
+.demo-row span{color:var(--green);}
+/* APP */
+#adminApp{display:none;}
+.app{display:flex;min-height:100vh;}
+/* SIDEBAR */
+.sb{width:240px;background:var(--s1);border-right:1px solid var(--b1);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;overflow-y:auto;}
+.sb-logo{padding:20px 18px 16px;border-bottom:1px solid var(--b1);}
+.sb-logo-t{font-family:var(--display);font-size:20px;font-weight:700;line-height:1;}
+.sb-logo-t span{color:var(--accent);}
+.sb-logo-s{font-size:9px;color:var(--t3);letter-spacing:0.16em;text-transform:uppercase;margin-top:3px;}
+.sb-sec{padding:16px 14px 5px;font-size:9px;color:var(--t3);letter-spacing:0.14em;text-transform:uppercase;}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:8px;cursor:pointer;transition:all 0.15s;color:var(--t2);font-size:13px;font-weight:500;margin:1px 8px;position:relative;}
+.ni:hover{background:var(--s2);color:var(--text);}
+.ni.on{background:var(--s3);color:var(--text);}
+.ni.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--accent);border-radius:0 2px 2px 0;}
+.ni-ic{font-size:14px;width:18px;text-align:center;}
+.nb{margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;}
+.nb-r{background:rgba(255,77,106,0.2);color:var(--red);}
+.nb-g{background:var(--gbg);color:var(--green);}
+.nb-a{background:var(--ambg);color:var(--amber);}
+.sb-bot{margin-top:auto;padding:12px;border-top:1px solid var(--b1);}
+.sb-admin{display:flex;align-items:center;gap:9px;padding:9px;border-radius:8px;cursor:pointer;}
+.sb-admin:hover{background:var(--s2);}
+.sa-ava{width:33px;height:33px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;font-family:var(--display);}
+.sa-name{font-size:12px;font-weight:600;}
+.sa-role{font-size:10px;color:var(--t3);}
+.sa-dot{width:7px;height:7px;border-radius:50%;background:var(--green);margin-left:auto;box-shadow:0 0 6px var(--green);}
+/* MAIN */
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column;}
+.topbar{height:56px;background:var(--s1);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 24px;gap:14px;position:sticky;top:0;z-index:40;}
+.tb-title{font-family:var(--display);font-size:15px;font-weight:600;}
+.tb-r{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.tb-time{font-family:var(--mono);font-size:11px;color:var(--t2);}
+.ab{background:var(--s2);border:1px solid var(--b1);color:var(--t2);padding:7px 14px;border-radius:7px;font-size:11px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:all 0.15s;}
+.ab:hover{border-color:var(--b2);color:var(--text);}
+.ab.pr{background:var(--accent);border-color:var(--accent);color:#fff;}
+.ab.pr:hover{background:var(--a2);}
+.ab.danger{border-color:rgba(255,77,106,0.3);color:var(--red);}
+.ab.danger:hover{background:var(--rbg);}
+.content{padding:22px 24px;flex:1;}
+.tab-panel{display:none;}
+.tab-panel.on{display:block;}
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px;}
+.kpi-row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.kpi{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:border-color 0.2s;}
+.kpi:hover{border-color:var(--b2);}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.kv::after{background:var(--accent)}.kg::after{background:var(--green)}.kr::after{background:var(--red)}.ka::after{background:var(--amber)}.kc::after{background:var(--cyan)}
+.kpi-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;}
+.kpi-val{font-family:var(--display);font-size:26px;font-weight:700;line-height:1;margin-bottom:6px;}
+.kpi-chg{font-size:11px;}.up{color:var(--green);}.dn{color:var(--red);}.nt{color:var(--t3);}
+/* PANEL */
+.panel{background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden;margin-bottom:14px;}
+.ph{padding:14px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;}
+.pt{font-family:var(--display);font-size:13px;font-weight:600;}
+.pa{font-size:11px;color:var(--a2);cursor:pointer;}
+.pb{padding:18px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px;}
+.g31{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{text-align:left;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:0.1em;padding:0 14px 12px;border-bottom:1px solid var(--b1);font-weight:500;}
+.tbl td{padding:12px 14px;border-bottom:1px solid var(--b1);font-size:12px;vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(255,255,255,0.01);}
+.mono{font-family:var(--mono);font-size:11px;color:var(--t2);}
+.fw{font-weight:600;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:10px;font-weight:600;}
+.bg{background:var(--gbg);color:var(--green);border:1px solid rgba(0,229,160,0.2);}
+.br{background:var(--rbg);color:var(--red);border:1px solid rgba(255,77,106,0.2);}
+.ba{background:var(--ambg);color:var(--amber);border:1px solid rgba(255,184,48,0.2);}
+.bb{background:var(--abg);color:var(--a2);border:1px solid rgba(91,108,255,0.2);}
+.bd{width:5px;height:5px;border-radius:50%;background:currentColor;}
+/* VENDOR CARDS */
+.vg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.vc{background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:18px;cursor:pointer;transition:all 0.15s;position:relative;overflow:hidden;}
+.vc:hover{border-color:var(--b2);transform:translateY(-1px);}
+.vc-name{font-size:14px;font-weight:600;margin-bottom:2px;}
+.vc-cat{font-size:11px;color:var(--t2);}
+.vc-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.vs{background:var(--s3);border-radius:8px;padding:8px 10px;}
+.vs-v{font-family:var(--display);font-size:16px;font-weight:700;}
+.vs-l{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;margin-top:1px;}
+.vc-bar{height:3px;background:var(--s3);border-radius:100px;margin-top:10px;overflow:hidden;}
+.vc-bf{height:100%;border-radius:100px;}
+.vc-acts{display:flex;gap:6px;margin-top:10px;}
+.vb{flex:1;background:none;border:1px solid var(--b1);border-radius:6px;color:var(--t2);font-size:10px;font-weight:500;padding:6px;cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:center;}
+.vb:hover{background:var(--s3);color:var(--text);}
+.vb.warn:hover{background:var(--rbg);border-color:rgba(255,77,106,0.3);color:var(--red);}
+.search{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:8px 14px;font-size:12px;color:var(--text);font-family:var(--sans);outline:none;transition:border-color 0.2s;width:200px;}
+.search:focus{border-color:var(--accent);}
+.search::placeholder{color:var(--t3);}
+/* CUST PANEL */
+.cust-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.cust-panel{background:var(--s1);border:1px solid var(--b1);border-radius:14px;overflow:hidden;}
+.cp-head{padding:16px 20px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px;}
+.cp-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.cp-title{font-family:var(--display);font-size:14px;font-weight:700;}
+.cp-sub{font-size:11px;color:var(--t3);margin-top:1px;}
+.cp-body{padding:20px;}
+.cfg{margin-bottom:16px;}
+.cfl{font-size:11px;color:var(--t2);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:7px;}
+.cfi{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:9px;padding:11px 14px;font-size:13px;color:var(--text);font-family:var(--sans);outline:none;transition:border-color 0.2s;}
+.cfi:focus{border-color:var(--accent);}
+.cfi::placeholder{color:var(--t3);}
+/* COLOR SWATCHES */
+.color-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.swatch{width:36px;height:36px;border-radius:9px;cursor:pointer;border:3px solid transparent;transition:all 0.15s;position:relative;}
+.swatch:hover{transform:scale(1.1);}
+.swatch.on{border-color:rgba(255,255,255,0.5);}
+.swatch::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:rgba(255,255,255,0.9);opacity:0;}
+.swatch.on::after{opacity:1;}
+.color-preview{width:100%;height:8px;border-radius:100px;margin-top:10px;transition:background 0.2s;}
+/* THEME CARDS */
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px;}
+.theme-card{border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all 0.15s;position:relative;}
+.theme-card:hover{transform:scale(1.02);}
+.theme-card.on{border-color:var(--accent);}
+.theme-card.on::after{content:'✓';position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.tc-preview{height:56px;display:flex;align-items:flex-end;padding:6px 8px;gap:4px;}
+.tcp-dot{width:8px;height:8px;border-radius:50%;}
+.tcp-bar{height:4px;border-radius:2px;flex:1;}
+.tc-name{padding:7px 8px;font-size:11px;font-weight:600;background:var(--s2);}
+/* FONT OPTS */
+.font-opts{display:flex;flex-direction:column;gap:8px;margin-top:8px;}
+.font-opt{padding:11px 14px;border-radius:9px;border:1px solid var(--b1);cursor:pointer;transition:all 0.15s;background:var(--s2);}
+.font-opt:hover{border-color:var(--b2);}
+.font-opt.on{border-color:var(--accent);background:var(--abg);}
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--b1);}
+.toggle-row:last-child{border-bottom:none;}
+.tr-label{font-size:13px;font-weight:500;}
+.tr-sub{font-size:11px;color:var(--t3);margin-top:1px;}
+.toggle{width:42px;height:24px;border-radius:100px;background:var(--s4);position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;}
+.toggle.on{background:var(--accent);}
+.tg-thumb{position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left 0.2s;}
+.toggle.on .tg-thumb{left:21px;}
+/* PREVIEW BAR */
+.preview-bar{background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:16px;margin-bottom:16px;}
+.pb-dot{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);flex-shrink:0;animation:gblink 2s ease-in-out infinite;}
+@keyframes gblink{0%,100%{opacity:1;}50%{opacity:0.5;}}
+/* PAY RIDERS */
+.pay-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.rider-pay-card{background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:18px;display:flex;align-items:center;gap:14px;transition:all 0.15s;position:relative;}
+.rider-pay-card:hover{border-color:var(--b2);}
+.rider-pay-card.selected{border-color:var(--accent);background:var(--abg);}
+.rpc-check{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--b2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all 0.15s;font-size:12px;}
+.rpc-check.on{background:var(--accent);border-color:var(--accent);color:#fff;}
+.rpc-ava{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--a2));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;font-family:var(--display);flex-shrink:0;}
+.rpc-name{font-size:14px;font-weight:700;margin-bottom:2px;}
+.rpc-meta{font-size:11px;color:var(--t3);}
+.rpc-earn-v{font-family:var(--display);font-size:22px;font-weight:700;color:var(--green);line-height:1;}
+.rpc-earn-l{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;}
+.rpc-pay-btn{background:var(--gbg);border:1px solid rgba(0,229,160,0.25);color:var(--green);padding:7px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:all 0.15s;white-space:nowrap;}
+.rpc-pay-btn:hover{background:var(--green);color:#000;}
+.rpc-pay-btn.paid{background:transparent;border-color:var(--b1);color:var(--t3);cursor:default;}
+.rpc-pay-btn.processing{background:var(--ambg);border-color:var(--amber);color:var(--amber);}
+.bulk-action-bar{background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:16px;margin-bottom:16px;}
+.pay-period-tabs{display:flex;gap:4px;background:var(--s1);border:1px solid var(--b1);border-radius:9px;padding:4px;width:fit-content;margin-bottom:16px;}
+.ppt{padding:7px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:var(--t2);transition:all 0.15s;}
+.ppt.on{background:var(--accent);color:#fff;}
+.pay-history-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--b1);}
+.pay-history-row:last-child{border-bottom:none;}
+/* GATEWAY */
+.gw-card{background:var(--s2);border:1px solid var(--b1);border-radius:14px;padding:22px;transition:all 0.15s;}
+.gw-card:hover{border-color:var(--b2);}
+.gw-card.active-gw{border-color:var(--green);box-shadow:0 0 0 1px rgba(0,229,160,0.15);}
+.gw-name{font-size:16px;font-weight:700;margin-bottom:2px;}
+.gw-sub{font-size:11px;color:var(--t2);}
+.gw-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:14px 0;}
+.gws{background:var(--s3);border-radius:8px;padding:10px 12px;}
+.gws-v{font-family:var(--display);font-size:16px;font-weight:700;}
+.gws-l{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;}
+.gw-config-btn{flex:1;background:var(--s3);border:1px solid var(--b1);border-radius:8px;color:var(--t2);padding:8px;font-size:11px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:center;}
+.gw-config-btn:hover{background:var(--s4);color:var(--text);}
+.gw-config-btn.primary{background:var(--abg);border-color:rgba(91,108,255,0.25);color:var(--a2);}
+.gw-webhook{background:var(--s3);border-radius:9px;padding:12px 14px;font-family:var(--mono);font-size:11px;color:var(--t2);word-break:break-all;margin-top:8px;border:1px solid var(--b1);display:flex;align-items:center;gap:8px;}
+.gw-health{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;}
+.gw-health.ok{color:var(--green);}
+.gw-health.warn{color:var(--amber);}
+.gw-dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+.gw-dot.ok{animation:gwpulse 2s ease-in-out infinite;}
+@keyframes gwpulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.txn-method-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--b1);}
+.txn-method-row:last-child{border-bottom:none;}
+.tmr-bar{flex:1;height:6px;background:var(--s3);border-radius:100px;overflow:hidden;margin:0 16px;}
+.tmr-bar-fill{height:100%;border-radius:100px;}
+/* BANNER */
+.banner-preview{border-radius:8px;padding:10px 16px;text-align:center;font-size:12px;font-weight:600;margin-bottom:12px;transition:all 0.3s;}
+/* NOTIF TMPL */
+.notif-tmpl{background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all 0.15s;}
+.notif-tmpl:hover{border-color:var(--b2);}
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;z-index:2000;background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;transform:translateY(60px);opacity:0;transition:all 0.3s ease;pointer-events:none;min-width:240px;}
+.toast.show{transform:translateY(0);opacity:1;}
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:500;display:none;align-items:center;justify-content:center;}
+.modal-ov.open{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--b1);border-radius:16px;width:520px;max-height:80vh;overflow-y:auto;}
+.mh{padding:20px 24px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;}
+.mh-title{font-family:var(--display);font-size:16px;font-weight:700;}
+.mc{width:30px;height:30px;border-radius:6px;background:var(--s2);border:1px solid var(--b1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--t2);}
+.mc:hover{background:var(--s3);}
+.mb{padding:24px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.fade-up{animation:fadeUp 0.3s ease;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px;}
+
+/* ══ HAMBURGER BUTTON ══ */
+.hamburger{
+  display:none;
+  flex-direction:column;justify-content:center;align-items:center;
+  width:38px;height:38px;border-radius:8px;
+  background:var(--s2);border:1px solid var(--b1);
+  cursor:pointer;gap:5px;flex-shrink:0;
+}
+.hamburger span{
+  display:block;width:18px;height:2px;background:var(--text);
+  border-radius:2px;transition:all 0.3s;
+}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* ══ SIDEBAR OVERLAY (mobile) ══ */
+.sb-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);
+  z-index:49;backdrop-filter:blur(2px);
+}
+.sb-overlay.show{display:block;}
+
+/* ══ RESPONSIVE BREAKPOINTS ══ */
+
+/* ── Tablet & smaller desktops (≤1100px) ── */
+@media(max-width:1100px){
+  .kpi-row{grid-template-columns:repeat(3,1fr);}
+  .kpi-row-4{grid-template-columns:repeat(2,1fr);}
+  .pay-kpi-row{grid-template-columns:repeat(2,1fr);}
+  .vg{grid-template-columns:repeat(2,1fr);}
+  .g31{grid-template-columns:1fr;}
+  .cust-grid{grid-template-columns:1fr;}
+}
+
+/* ── Tablet (≤900px) ── */
+@media(max-width:900px){
+  /* Login: stack vertically */
+  #loginScreen{flex-direction:column;}
+  .ll{padding:40px 24px;min-height:50vh;}
+  .ll-stats{grid-template-columns:repeat(3,1fr);}
+  .lr{width:100%;padding:32px 24px;border-left:none;border-top:1px solid var(--b1);}
+
+  /* Sidebar: slide-in drawer */
+  .sb{
+    transform:translateX(-100%);transition:transform 0.3s ease;
+    box-shadow:4px 0 32px rgba(0,0,0,0.4);z-index:50;
+  }
+  .sb.open{transform:translateX(0);}
+  .hamburger{display:flex;}
+  .sb-close-btn{display:flex!important;}
+  .main{margin-left:0;}
+  .topbar{padding:0 14px;gap:10px;}
+
+  /* Grids → single column */
+  .kpi-row{grid-template-columns:repeat(2,1fr);}
+  .kpi-row-4{grid-template-columns:repeat(2,1fr);}
+  .pay-kpi-row{grid-template-columns:repeat(2,1fr);}
+  .g2,.g3,.g31,.g13,.cust-grid{grid-template-columns:1fr;}
+  .vg{grid-template-columns:1fr 1fr;}
+
+  /* Tables: horizontal scroll */
+  .panel .pb{overflow-x:auto;}
+  .tbl{min-width:600px;}
+
+  /* Branding color row */
+  .color-row{gap:6px;}
+  .swatch{width:30px;height:30px;}
+  .theme-grid{grid-template-columns:repeat(3,1fr);}
+
+  /* Bulk action bar */
+  .bulk-action-bar{flex-wrap:wrap;gap:8px;}
+  .bulk-action-bar > div:last-child{width:100%;justify-content:flex-end;}
+
+  /* Rider pay cards */
+  .rider-pay-card{flex-wrap:wrap;}
+  .rpc-earn-v{font-size:18px;}
+
+  /* Pay period tabs */
+  .pay-period-tabs{flex-wrap:wrap;}
+
+  /* Gateway cards */
+  #gwCards{grid-template-columns:1fr 1fr!important;}
+
+  /* Topbar actions */
+  .tb-r .ab:not(.pr){display:none;}
+}
+
+/* ── Mobile (≤600px) ── */
+@media(max-width:600px){
+  /* Login */
+  .ll-stats{grid-template-columns:1fr 1fr;}
+  .role-row{flex-direction:column;gap:6px;}
+  .lr{padding:24px 16px;}
+
+  /* Content padding */
+  .content{padding:14px 12px;}
+  .topbar{padding:0 12px;height:52px;}
+  .tb-title{font-size:13px;}
+  .tb-time{display:none;}
+
+  /* KPI → 1 or 2 col */
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .kpi-row-4{grid-template-columns:1fr 1fr;}
+  .pay-kpi-row{grid-template-columns:1fr 1fr;}
+  .kpi-val{font-size:22px;}
+
+  /* Vendor grid */
+  .vg{grid-template-columns:1fr;}
+
+  /* Panel headers */
+  .ph{flex-wrap:wrap;gap:8px;}
+  .ph .pa{font-size:11px;}
+
+  /* Search bars */
+  .search{width:100%!important;}
+
+  /* Topbar filter row */
+  #tab-vendors > div:first-child{flex-direction:column;align-items:stretch;}
+  #tab-vendors > div:first-child > div{margin-left:0;flex-wrap:wrap;}
+
+  /* Gateway cards → single column */
+  #gwCards{grid-template-columns:1fr!important;}
+
+  /* Rider pay card */
+  .rider-pay-card{padding:12px;}
+  .rpc-check{width:18px;height:18px;}
+
+  /* Cust panel body padding */
+  .cp-body{padding:14px;}
+
+  /* Banner preview */
+  .banner-preview{font-size:11px;padding:8px 10px;}
+
+  /* Alert badges */
+  .nb{display:none;}
+
+  /* Payout row */
+  .pay-history-row{flex-wrap:wrap;}
+
+  /* Modal */
+  .modal{width:calc(100vw - 24px);margin:12px;}
+  .mb{padding:16px;}
+
+  /* Font opts */
+  .font-opts{gap:6px;}
+  .font-opt{padding:9px 12px;}
+
+  /* Theme grid */
+  .theme-grid{grid-template-columns:repeat(3,1fr);}
+  .tc-preview{height:44px;}
+
+  /* Swatches */
+  .swatch{width:28px;height:28px;}
+
+  /* Topbar alert pill */
+  .topbar > .tb-r > div:first-child{
+    font-size:10px;padding:5px 8px;
+  }
+  .topbar > .tb-r > div:first-child::before{content:'🔔';margin-right:4px;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="ll">
+    <div class="ll-grid"></div><div class="ll-glow"></div>
+    <div class="ll-brand">
+      <div class="ll-logo" id="loginLogo"><img src="fr-logo-circle.png" style="width:64px;height:64px;border-radius:50%;display:block;margin:0 auto 12px;"><img src="fr-logo-text.png" style="height:36px;object-fit:contain;filter:invert(1);display:block;margin:0 auto;"></div>
+      <div class="ll-sub">Master Admin Control</div>
+    </div>
+    <div class="ll-stats">
+      <div class="lsc"><div class="lsc-v">214</div><div class="lsc-l">Vendors</div></div>
+      <div class="lsc"><div class="lsc-v">18.4k</div><div class="lsc-l">Orders Today</div></div>
+      <div class="lsc"><div class="lsc-v">₹2.1Cr</div><div class="lsc-l">GMV Today</div></div>
+    </div>
+  </div>
+  <div class="lr">
+    <div class="lr-title">Admin Login</div>
+    <div class="lr-sub">Access the master control panel</div>
+    <div style="margin-bottom:20px;">
+      <div class="fl">Login As</div>
+      <div class="role-row">
+        <div class="role-btn on" onclick="setRole(this,'super')">🔑 Super Admin</div>
+        <div class="role-btn" onclick="setRole(this,'ops')">⚙️ Operations</div>
+        <div class="role-btn" onclick="setRole(this,'finance')">💰 Finance</div>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Email</label><input class="fi" type="email" value="admin@flashfit.in"/></div>
+    <div class="fg"><label class="fl">Password</label><input class="fi" type="password" value="admin123"/></div>
+    <button class="btn-login" id="loginBtn" onclick="doLogin()">Sign In to Master Panel</button>
+    <div class="demo-box">
+      <div class="demo-label">Demo Credentials</div>
+      <div class="demo-row">Email: <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1c7d787175725c7a707d6f747a7568327572">[email&#160;protected]</a></span></div>
+      <div class="demo-row">Password: <span>admin123</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<!-- Sidebar overlay for mobile -->
+<div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+
+<div id="adminApp">
+<div class="app">
+<aside class="sb">
+  <div class="sb-logo" style="display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <div class="sb-logo-t" id="sbLogo"><img src="fr-logo-text.png" style="height:15px;object-fit:contain;filter:invert(1);vertical-align:middle;"> <span style="font-size:9px;color:var(--t3);font-family:var(--sans);font-weight:400;margin-left:4px;">ADMIN</span></div>
+      <div class="sb-logo-s">Master Control</div>
+    </div>
+    <div onclick="closeSidebar()" style="width:28px;height:28px;border-radius:6px;background:var(--s2);border:1px solid var(--b1);display:none;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--t2);flex-shrink:0;" class="sb-close-btn">×</div>
+  </div>
+  <div class="sb-sec">Platform</div>
+  <div class="ni on" onclick="goTab('overview',this)"><span class="ni-ic">⬡</span> Overview</div>
+  <div class="ni" onclick="goTab('vendors',this)"><span class="ni-ic">🏪</span> Vendors <span class="nb nb-g">214</span></div>
+  <div class="ni" onclick="goTab('orders',this)"><span class="ni-ic">📦</span> All Orders <span class="nb nb-r">12</span></div>
+  <div class="sb-sec">Data</div>
+  <div class="ni" onclick="goTab('inventory',this)"><span class="ni-ic">🗃️</span> Inventory <span class="nb nb-a">7</span></div>
+  <div class="ni" onclick="goTab('analytics',this)"><span class="ni-ic">📊</span> Analytics</div>
+  <div class="ni" onclick="goTab('finance',this)"><span class="ni-ic">💰</span> Finance</div>
+  <div class="ni" onclick="goTab('pay-riders',this)"><span class="ni-ic">🏍️</span> Pay Riders <span class="nb nb-a" id="nb-payriders">8</span></div>
+  <div class="ni" onclick="goTab('payment-gw',this)"><span class="ni-ic">💳</span> Payment Gateway</div>
+  <div class="sb-sec">People</div>
+  <div class="ni" onclick="goTab('customers',this)"><span class="ni-ic">👥</span> Customers</div>
+  <div class="ni" onclick="goTab('riders',this)"><span class="ni-ic">🏍️</span> Riders <span class="nb nb-g">340</span></div>
+  <div class="sb-sec">Customise</div>
+  <div class="ni" onclick="goTab('branding',this)"><span class="ni-ic">🎨</span> Branding & Theme</div>
+  <div class="ni" onclick="goTab('platform',this)"><span class="ni-ic">⚙️</span> Platform Config</div>
+  <div class="ni" onclick="goTab('alerts',this)"><span class="ni-ic">🔔</span> Alerts <span class="nb nb-r">5</span></div>
+  <div class="sb-bot">
+    <div class="sb-admin">
+      <div class="sa-ava">SA</div>
+      <div><div class="sa-name">Super Admin</div><div class="sa-role"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d6b7b2bbbfb896b0bab7a5beb0bfa2f8bfb8">[email&#160;protected]</a></div></div>
+      <div class="sa-dot"></div>
+    </div>
+    <button class="ab danger" style="width:100%;margin-top:8px;text-align:center;" onclick="logout()">Sign Out</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="tb-title" id="tbTitle">Platform Overview</div>
+    <div class="tb-r">
+      <div style="display:flex;align-items:center;gap:6px;background:var(--rbg);border:1px solid rgba(255,77,106,0.2);color:var(--red);padding:7px 14px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;" onclick="goTab('alerts',document.querySelector('[onclick*=alerts]'))">🔔 5 Alerts</div>
+      <div class="tb-time" id="clock">--:--:--</div>
+      <button class="ab" onclick="toast('🔄','Data refreshed','All metrics updated')">↻ Refresh</button>
+      <button class="ab pr" onclick="openModal('addVendor')">+ Add Vendor</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="tab-panel on fade-up" id="tab-overview">
+      <div class="kpi-row">
+        <div class="kpi kv"><div class="kpi-lbl">Platform GMV Today</div><div class="kpi-val">₹2.14Cr</div><div class="kpi-chg up">↑ 22%</div></div>
+        <div class="kpi kg"><div class="kpi-lbl">Total Orders</div><div class="kpi-val" id="kpi-orders">18,492</div><div class="kpi-chg up">↑ 1,204 new</div></div>
+        <div class="kpi ka"><div class="kpi-lbl">Active Vendors</div><div class="kpi-val">214</div><div class="kpi-chg nt">8 pending</div></div>
+        <div class="kpi kr"><div class="kpi-lbl">Avg Delivery</div><div class="kpi-val">44<span style="font-size:14px;font-weight:400"> min</span></div><div class="kpi-chg up">↓ 2 min</div></div>
+        <div class="kpi kc"><div class="kpi-lbl">Commission</div><div class="kpi-val">₹21.4L</div><div class="kpi-chg up">↑ 18%</div></div>
+      </div>
+      <div class="g31">
+        <div class="panel"><div class="ph"><span class="pt">Revenue — 30 Days</span><span class="pa">Export CSV</span></div><div class="pb"><div style="height:200px"><canvas id="revenueChart"></canvas></div></div></div>
+        <div class="panel"><div class="ph"><span class="pt">Order Status</span></div><div class="pb"><div style="height:200px"><canvas id="statusDonut"></canvas></div></div></div>
+      </div>
+      <div class="g3">
+        <div class="panel"><div class="ph"><span class="pt">Top Vendors</span></div><div class="pb" style="padding:0;"><table class="tbl" id="topVendorTbl"></table></div></div>
+        <div class="panel"><div class="ph"><span class="pt">Critical Alerts</span></div><div class="pb"><div id="overviewAlerts"></div></div></div>
+        <div class="panel"><div class="ph"><span class="pt">Platform Health</span></div><div class="pb"><div id="healthPanel"></div></div></div>
+      </div>
+    </div>
+
+    <!-- VENDORS -->
+    <div class="tab-panel fade-up" id="tab-vendors">
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+        <input class="search" placeholder="Search vendors…" oninput="filterVendors(this.value)"/>
+        <div style="display:flex;gap:6px;margin-left:auto;">
+          <button class="ab" style="background:var(--accent);border-color:var(--accent);color:#fff;" onclick="filterVS('all',this)">All</button>
+          <button class="ab" onclick="filterVS('active',this)">Active</button>
+          <button class="ab" onclick="filterVS('pending',this)">Pending</button>
+          <button class="ab" onclick="filterVS('suspended',this)">Suspended</button>
+          <button class="ab pr" onclick="openModal('addVendor')">+ Add Vendor</button>
+        </div>
+      </div>
+      <div class="vg" id="vendorGrid"></div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="tab-panel fade-up" id="tab-orders">
+      <div class="kpi-row-4">
+        <div class="kpi kg"><div class="kpi-lbl">New Orders</div><div class="kpi-val">847</div><div class="kpi-chg up">Last 1 hour</div></div>
+        <div class="kpi ka"><div class="kpi-lbl">In Transit</div><div class="kpi-val">3,241</div><div class="kpi-chg nt">All vendors</div></div>
+        <div class="kpi kv"><div class="kpi-lbl">Delivered Today</div><div class="kpi-val">12,891</div><div class="kpi-chg up">↑ 18%</div></div>
+        <div class="kpi kr"><div class="kpi-lbl">Cancelled</div><div class="kpi-val">134</div><div class="kpi-chg dn">↑ 22 more</div></div>
+      </div>
+      <div class="panel"><div class="ph"><span class="pt">All Platform Orders</span><div style="display:flex;gap:6px;"><input class="search" placeholder="Search order ID…" style="width:150px;"/><button class="ab">Export</button></div></div><div class="pb" style="padding:0;"><table class="tbl" id="allOrdersTbl"></table></div></div>
+    </div>
+
+    <!-- INVENTORY -->
+    <div class="tab-panel fade-up" id="tab-inventory">
+      <div class="g2">
+        <div class="panel"><div class="ph"><span class="pt">Stock Levels by Vendor</span></div><div class="pb" style="padding:0 18px;"><div id="invVendorList"></div></div></div>
+        <div class="panel"><div class="ph"><span class="pt">Category Distribution</span></div><div class="pb"><div style="height:220px"><canvas id="invChart"></canvas></div></div></div>
+      </div>
+      <div class="panel"><div class="ph"><span class="pt">Low Stock & Out-of-Stock</span><span class="nb nb-a">12 items</span></div><div class="pb" style="padding:0;"><table class="tbl" id="invTbl"></table></div></div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="tab-panel fade-up" id="tab-analytics">
+      <div class="kpi-row">
+        <div class="kpi kv"><div class="kpi-lbl">Monthly GMV</div><div class="kpi-val">₹64Cr</div><div class="kpi-chg up">↑ 31%</div></div>
+        <div class="kpi kg"><div class="kpi-lbl">Monthly Orders</div><div class="kpi-val">4.8L</div><div class="kpi-chg up">↑ 28%</div></div>
+        <div class="kpi ka"><div class="kpi-lbl">Avg Cart Value</div><div class="kpi-val">₹1,333</div><div class="kpi-chg up">↑ ₹82</div></div>
+        <div class="kpi kr"><div class="kpi-lbl">Customer LTV</div><div class="kpi-val">₹8,420</div><div class="kpi-chg up">↑ 12%</div></div>
+        <div class="kpi kc"><div class="kpi-lbl">NPS Score</div><div class="kpi-val">71</div><div class="kpi-chg up">↑ 4 pts</div></div>
+      </div>
+      <div class="g2">
+        <div class="panel"><div class="ph"><span class="pt">GMV Trend — 12 Months</span></div><div class="pb"><div style="height:220px"><canvas id="gmvChart"></canvas></div></div></div>
+        <div class="panel"><div class="ph"><span class="pt">New vs Returning</span></div><div class="pb"><div style="height:220px"><canvas id="custChart"></canvas></div></div></div>
+      </div>
+      <div class="g2">
+        <div class="panel"><div class="ph"><span class="pt">Orders by City</span></div><div class="pb"><div style="height:200px"><canvas id="cityChart"></canvas></div></div></div>
+        <div class="panel"><div class="ph"><span class="pt">Category Performance</span></div><div class="pb"><div style="height:200px"><canvas id="catChart"></canvas></div></div></div>
+      </div>
+    </div>
+
+    <!-- FINANCE -->
+    <div class="tab-panel fade-up" id="tab-finance">
+      <div class="kpi-row">
+        <div class="kpi kg"><div class="kpi-lbl">Gross Revenue</div><div class="kpi-val">₹64Cr</div><div class="kpi-chg up">↑ 31%</div></div>
+        <div class="kpi kv"><div class="kpi-lbl">Commission</div><div class="kpi-val">₹6.4Cr</div><div class="kpi-chg nt">10% avg</div></div>
+        <div class="kpi ka"><div class="kpi-lbl">Pending Payouts</div><div class="kpi-val">₹4.1Cr</div><div class="kpi-chg nt">42 vendors</div></div>
+        <div class="kpi kr"><div class="kpi-lbl">Refunds</div><div class="kpi-val">₹18.2L</div><div class="kpi-chg dn">↑ 2.8%</div></div>
+        <div class="kpi kc"><div class="kpi-lbl">Net Profit</div><div class="kpi-val">₹2.1Cr</div><div class="kpi-chg up">↑ 24%</div></div>
+      </div>
+      <div class="g2">
+        <div class="panel"><div class="ph"><span class="pt">Pending Payouts</span><span class="pa">Process All →</span></div><div class="pb" style="padding:0 18px;"><div id="payoutList"></div></div></div>
+        <div class="panel"><div class="ph"><span class="pt">Revenue Breakdown</span></div><div class="pb"><div style="height:260px"><canvas id="finChart"></canvas></div></div></div>
+      </div>
+      <div class="panel"><div class="ph"><span class="pt">Transaction Ledger</span><span class="pa">Download PDF</span></div><div class="pb" style="padding:0;"><table class="tbl" id="ledgerTbl"></table></div></div>
+    </div>
+
+    <!-- PAY RIDERS -->
+    <div class="tab-panel fade-up" id="tab-pay-riders">
+      <div class="pay-kpi-row">
+        <div class="kpi kg"><div class="kpi-lbl">Total Pending</div><div class="kpi-val" id="prKpiPending">₹1.24L</div><div class="kpi-chg nt">8 riders awaiting</div></div>
+        <div class="kpi ka"><div class="kpi-lbl">Paid This Week</div><div class="kpi-val">₹3.86L</div><div class="kpi-chg up">↑ 22%</div></div>
+        <div class="kpi kv"><div class="kpi-lbl">Avg Pay Per Rider</div><div class="kpi-val">₹1,540</div><div class="kpi-chg up">↑ ₹120</div></div>
+        <div class="kpi kc"><div class="kpi-lbl">Next Payout</div><div class="kpi-val" style="font-size:18px;">Friday</div><div class="kpi-chg nt">Mar 20 · Auto-batch</div></div>
+      </div>
+      <div class="bulk-action-bar">
+        <div style="font-size:13px;font-weight:600;"><span id="selectedCount" style="color:var(--accent);">0</span> riders selected</div>
+        <div style="font-size:13px;color:var(--t2);">Total: <strong style="color:var(--green);font-size:16px;" id="selectedTotal">₹0</strong></div>
+        <div style="margin-left:auto;display:flex;gap:8px;">
+          <button class="ab" onclick="selectAllRiders()">Select All Pending</button>
+          <button class="ab" onclick="clearSelection()">Clear</button>
+          <button class="ab pr" id="bulkPayBtn" onclick="processBulkPay()" style="opacity:0.5;" disabled>💸 Pay Selected</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="pay-period-tabs">
+          <div class="ppt on" onclick="setPayPeriod('pending',this)">Pending</div>
+          <div class="ppt" onclick="setPayPeriod('today',this)">Paid Today</div>
+          <div class="ppt" onclick="setPayPeriod('week',this)">This Week</div>
+          <div class="ppt" onclick="setPayPeriod('history',this)">All History</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <select class="search" style="width:auto;"><option>All Cities</option><option>Mumbai</option><option>Delhi</option><option>Bengaluru</option></select>
+          <button class="ab" onclick="toast('📄','Exporting','Rider payout report downloaded')">Export CSV</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;" id="riderPayCards"></div>
+      <div class="g2">
+        <div class="panel"><div class="ph"><span class="pt">Payout History — Last 8 Weeks</span></div><div class="pb"><div style="height:220px"><canvas id="payoutHistoryChart"></canvas></div></div></div>
+        <div class="panel"><div class="ph"><span class="pt">Recent Transactions</span><span class="pa" onclick="toast('📄','Downloading','Full transaction history')">Download →</span></div><div class="pb" style="padding:0 18px;"><div id="payHistory"></div></div></div>
+      </div>
+      <div class="panel"><div class="ph"><span class="pt">Payout Schedule & Rules</span><span class="pa" onclick="toast('✅','Schedule saved','Payout rules updated')">Save Changes</span></div><div class="pb"><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;"><div><label class="cfl">Payout Frequency</label><select class="cfi"><option>Weekly (Friday)</option><option>Bi-weekly</option><option>Daily</option><option>On-demand</option></select></div><div><label class="cfl">Minimum Payout (₹)</label><input class="cfi" value="500" type="number"/></div><div><label class="cfl">Payout Method</label><select class="cfi"><option>Bank Transfer (NEFT)</option><option>UPI Instant</option><option>Razorpay Payouts</option></select></div><div><label class="cfl">TDS Deduction (%)</label><input class="cfi" value="1" type="number" step="0.5"/></div></div></div></div>
+    </div>
+
+    <!-- PAYMENT GATEWAY -->
+    <div class="tab-panel fade-up" id="tab-payment-gw">
+      <div class="pay-kpi-row">
+        <div class="kpi kg"><div class="kpi-lbl">Total Processed</div><div class="kpi-val">₹64Cr</div><div class="kpi-chg up">↑ 31%</div></div>
+        <div class="kpi kv"><div class="kpi-lbl">Success Rate</div><div class="kpi-val">97.2%</div><div class="kpi-chg dn">↓ 0.8%</div></div>
+        <div class="kpi ka"><div class="kpi-lbl">Failed Transactions</div><div class="kpi-val">1,284</div><div class="kpi-chg dn">↑ 220 this week</div></div>
+        <div class="kpi kc"><div class="kpi-lbl">Avg Transaction Value</div><div class="kpi-val">₹1,333</div><div class="kpi-chg up">↑ ₹82</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px;" id="gwCards"></div>
+      <div class="g2">
+        <div class="panel"><div class="ph"><span class="pt">Volume by Payment Method</span></div><div class="pb"><div style="height:200px;margin-bottom:16px;"><canvas id="gwVolumeChart"></canvas></div><div id="txnMethodList"></div></div></div>
+        <div class="panel"><div class="ph"><span class="pt">Live Transaction Feed</span><span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;animation:gwpulse 2s infinite;"></span></div><div class="pb" style="padding:0 18px;"><div id="liveTxnFeed"></div></div></div>
+      </div>
+      <div class="panel"><div class="ph"><span class="pt">Failed Transaction Analysis</span><span class="pa">Export Report →</span></div><div class="pb" style="padding:0;"><table class="tbl" id="failedTxnTbl"></table></div></div>
+    </div>
+
+    <!-- CUSTOMERS -->
+    <div class="tab-panel fade-up" id="tab-customers">
+      <div class="kpi-row-4">
+        <div class="kpi kg"><div class="kpi-lbl">Total Customers</div><div class="kpi-val">2.4L</div><div class="kpi-chg up">↑ 8,200 this week</div></div>
+        <div class="kpi kv"><div class="kpi-lbl">Active (30d)</div><div class="kpi-val">88,400</div><div class="kpi-chg up">↑ 12%</div></div>
+        <div class="kpi ka"><div class="kpi-lbl">Avg Orders/User</div><div class="kpi-val">3.8</div><div class="kpi-chg up">↑ 0.4</div></div>
+        <div class="kpi kr"><div class="kpi-lbl">Churned (30d)</div><div class="kpi-val">1,240</div><div class="kpi-chg dn">↑ 180 vs avg</div></div>
+      </div>
+      <div class="panel"><div class="ph"><span class="pt">Customer Directory</span><span class="pa">Export</span></div><div class="pb" style="padding:0;"><table class="tbl" id="custTbl"></table></div></div>
+    </div>
+
+    <!-- RIDERS -->
+    <div class="tab-panel fade-up" id="tab-riders">
+      <div class="kpi-row-4">
+        <div class="kpi kg"><div class="kpi-lbl">Active Now</div><div class="kpi-val">340</div><div class="kpi-chg up">Peak hour</div></div>
+        <div class="kpi kv"><div class="kpi-lbl">Total Enrolled</div><div class="kpi-val">892</div><div class="kpi-chg up">↑ 34 this week</div></div>
+        <div class="kpi ka"><div class="kpi-lbl">Avg Rating</div><div class="kpi-val">4.7★</div><div class="kpi-chg up">↑ 0.1</div></div>
+        <div class="kpi kr"><div class="kpi-lbl">Avg Deliveries/Day</div><div class="kpi-val">14.2</div><div class="kpi-chg nt">Per rider</div></div>
+      </div>
+      <div class="panel"><div class="ph"><span class="pt">Rider Leaderboard</span></div><div class="pb" style="padding:0;"><table class="tbl" id="riderTbl"></table></div></div>
+    </div>
+
+    <!-- BRANDING -->
+    <div class="tab-panel fade-up" id="tab-branding">
+      <div class="preview-bar">
+        <div class="pb-dot"></div>
+        <div><div style="font-size:13px;font-weight:600;">Live Preview Mode</div><div style="font-size:11px;color:var(--t3);">Changes apply across all panels instantly</div></div>
+        <div style="margin-left:auto;display:flex;gap:8px;">
+          <button class="ab" onclick="resetBranding()">↺ Reset Defaults</button>
+          <button class="ab pr" onclick="applyBranding()">✓ Save & Apply All</button>
+        </div>
+      </div>
+      <div class="cust-grid">
+        <div class="cust-panel">
+          <div class="cp-head"><div class="cp-icon" style="background:var(--abg);">🏷️</div><div><div class="cp-title">Brand Identity</div><div class="cp-sub">Name, tagline, AI assistant</div></div></div>
+          <div class="cp-body">
+            <div class="cfg"><label class="cfl">Platform / Website Name</label><input class="cfi" id="brandName" value="Fresh Republic" oninput="liveUpdateBrand()"/></div>
+            <div class="cfg"><label class="cfl">Tagline</label><input class="cfi" id="brandTagline" value="60-Minute Fashion Delivery"/></div>
+            <div class="cfg"><label class="cfl">AI Assistant Name</label><input class="cfi" id="aiName" value="Priya" oninput="liveUpdateBrand()"/></div>
+            <div class="cfg"><label class="cfl">AI Persona</label><select class="cfi" id="aiPersona"><option>Fashion Stylist</option><option>Friendly Shopper</option><option>Luxury Advisor</option><option>Trendsetter</option></select></div>
+            <div class="cfg"><label class="cfl">Support Email</label><input class="cfi" value="support@flashfit.in"/></div>
+            <div style="background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:14px;margin-top:6px;">
+              <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Live Preview</div>
+              <div id="brandPreview"><img src="fr-logo-text.png" style="height:28px;object-fit:contain;filter:invert(1);"></div>
+              <div id="aiPreview" style="font-size:11px;color:var(--t2);margin-top:4px;">AI Stylist: Priya · Fashion Stylist</div>
+            </div>
+          </div>
+        </div>
+        <div class="cust-panel">
+          <div class="cp-head"><div class="cp-icon" style="background:var(--abg);">🎨</div><div><div class="cp-title">Accent Color</div><div class="cp-sub">Primary brand color across all panels</div></div></div>
+          <div class="cp-body">
+            <div class="cfg"><label class="cfl">Choose Color</label>
+              <div class="color-row">
+                <div class="swatch on" style="background:#5b6cff;" onclick="setAccent('#5b6cff',this)"></div>
+                <div class="swatch" style="background:#ff4820;" onclick="setAccent('#ff4820',this)"></div>
+                <div class="swatch" style="background:#00e676;" onclick="setAccent('#00e676',this)"></div>
+                <div class="swatch" style="background:#ff6b9d;" onclick="setAccent('#ff6b9d',this)"></div>
+                <div class="swatch" style="background:#ffb830;" onclick="setAccent('#ffb830',this)"></div>
+                <div class="swatch" style="background:#00d4ff;" onclick="setAccent('#00d4ff',this)"></div>
+                <div class="swatch" style="background:#b06cff;" onclick="setAccent('#b06cff',this)"></div>
+                <div class="swatch" style="background:#2dd4bf;" onclick="setAccent('#2dd4bf',this)"></div>
+              </div>
+            </div>
+            <div class="cfg"><label class="cfl">Custom Hex</label>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input class="cfi" id="customColor" value="#5b6cff" oninput="setAccentCustom(this.value)" style="font-family:var(--mono);"/>
+                <div id="colorDot" style="width:36px;height:36px;border-radius:9px;background:#5b6cff;flex-shrink:0;border:1px solid var(--b1);"></div>
+              </div>
+            </div>
+            <div class="color-preview" id="colorPreview" style="background:#5b6cff;"></div>
+          </div>
+        </div>
+        <div class="cust-panel">
+          <div class="cp-head"><div class="cp-icon" style="background:var(--gbg);">🌗</div><div><div class="cp-title">Panel Themes</div><div class="cp-sub">Dark / light for each panel</div></div></div>
+          <div class="cp-body">
+            <div class="cfg"><label class="cfl">Customer Site Theme</label>
+              <div class="theme-grid">
+                <div class="theme-card on" onclick="setTheme('customer','warm-light',this)"><div class="tc-preview" style="background:#f9f6f1;"><div class="tcp-dot" style="background:#1a1510;"></div><div class="tcp-bar" style="background:#d4420a;"></div></div><div class="tc-name" style="color:#1a1510;">Warm Light</div></div>
+                <div class="theme-card" onclick="setTheme('customer','dark',this)"><div class="tc-preview" style="background:#0a0a0e;"><div class="tcp-dot" style="background:#f0f0ff;"></div><div class="tcp-bar" style="background:#5b6cff;"></div></div><div class="tc-name">Dark Mode</div></div>
+                <div class="theme-card" onclick="setTheme('customer','luxury',this)"><div class="tc-preview" style="background:#0d0a06;"><div class="tcp-dot" style="background:#d4af6a;"></div><div class="tcp-bar" style="background:#d4af6a;"></div></div><div class="tc-name">Luxury</div></div>
+              </div>
+            </div>
+            <div class="cfg" style="margin-top:12px;"><label class="cfl">Admin Panel Theme</label>
+              <div class="theme-grid">
+                <div class="theme-card on" onclick="setTheme('admin','dark-blue',this)"><div class="tc-preview" style="background:#07080b;"><div class="tcp-dot" style="background:#f0f2ff;"></div><div class="tcp-bar" style="background:#5b6cff;"></div></div><div class="tc-name">Dark Navy</div></div>
+                <div class="theme-card" onclick="setTheme('admin','dark-green',this)"><div class="tc-preview" style="background:#060c08;"><div class="tcp-dot" style="background:#f0fff6;"></div><div class="tcp-bar" style="background:#00e676;"></div></div><div class="tc-name">Dark Forest</div></div>
+                <div class="theme-card" onclick="setTheme('admin','light',this)"><div class="tc-preview" style="background:#f8f9ff;"><div class="tcp-dot" style="background:#0a0c1a;"></div><div class="tcp-bar" style="background:#3b4cdb;"></div></div><div class="tc-name">Light Mode</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cust-panel">
+          <div class="cp-head"><div class="cp-icon" style="background:var(--ambg);">Aa</div><div><div class="cp-title">Typography</div><div class="cp-sub">Display font for headings and logo</div></div></div>
+          <div class="cp-body">
+            <label class="cfl">Display Font</label>
+            <div class="font-opts">
+              <div class="font-opt on" onclick="setFont('Bebas Neue',this)"><div style="font-family:'Bebas Neue',sans-serif;letter-spacing:0.04em;font-size:18px;font-weight:700;">Bebas Neue</div><div style="font-size:11px;color:var(--t2);">Bold · All-caps · Impact</div></div>
+              <div class="font-opt" onclick="setFont('Fraunces',this)"><div style="font-family:'Fraunces',serif;font-size:18px;">Fraunces</div><div style="font-size:11px;color:var(--t2);">Elegant · Serif · Luxury</div></div>
+              <div class="font-opt" onclick="setFont('Syne',this)"><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;">Syne</div><div style="font-size:11px;color:var(--t2);">Modern · Geometric · Tech</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Announcement Banner -->
+      <div class="cust-panel" style="margin-top:16px;">
+        <div class="cp-head"><div class="cp-icon" style="background:var(--ambg);">📢</div><div><div class="cp-title">Announcement Banner</div><div class="cp-sub">Top banner on customer site</div></div></div>
+        <div class="cp-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div>
+              <div class="cfg"><label class="cfl">Banner Text</label><input class="cfi" id="bannerText" value="⚡ Free delivery on first order · 60-minute guarantee or next order free" oninput="updateBannerPreview()"/></div>
+              <div class="cfg"><label class="cfl">Background Color</label><div class="color-row"><div class="swatch on" style="background:#1a1510;" onclick="setBannerBg('#1a1510',this)"></div><div class="swatch" style="background:#d4420a;" onclick="setBannerBg('#d4420a',this)"></div><div class="swatch" style="background:#0a8c4a;" onclick="setBannerBg('#0a8c4a',this)"></div><div class="swatch" style="background:#1a1a2e;" onclick="setBannerBg('#1a1a2e',this)"></div></div></div>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
+                <div class="toggle on" id="bannerToggle" onclick="toggleBanner(this)"><div class="tg-thumb"></div></div>
+                <span style="font-size:12px;font-weight:500;">Banner visible</span>
+              </div>
+            </div>
+            <div><label class="cfl">Preview</label><div class="banner-preview" id="bannerPreview" style="background:#1a1510;color:#f9f6f1;">⚡ Free delivery on first order · 60-minute guarantee or next order free</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLATFORM CONFIG -->
+    <div class="tab-panel fade-up" id="tab-platform">
+      <div class="cust-grid">
+        <div class="cust-panel">
+          <div class="cp-head"><div class="cp-icon" style="background:var(--abg);">⚙️</div><div><div class="cp-title">Core Settings</div><div class="cp-sub">Delivery, commission, geography</div></div></div>
+          <div class="cp-body">
+            <div class="cfg"><label class="cfl">Commission Rate (%)</label><input class="cfi" value="10" type="number"/></div>
+            <div class="cfg"><label class="cfl">Delivery SLA (minutes)</label><input class="cfi" value="60" type="number"/></div>
+            <div class="cfg"><label class="cfl">Max Delivery Radius (km)</label><input class="cfi" value="10" type="number"/></div>
+            <div class="cfg"><label class="cfl">Minimum Order Value (₹)</label><input class="cfi" value="499" type="number"/></div>
+            <div class="cfg"><label class="cfl">Return Window (minutes)</label><input class="cfi" value="30" type="number"/></div>
+            <button class="ab pr" onclick="toast('✅','Core settings saved','Platform config updated')">Save Settings</button>
+          </div>
+        </div>
+        <div class="cust-panel">
+          <div class="cp-head"><div class="cp-icon" style="background:var(--gbg);">🔧</div><div><div class="cp-title">Platform Features</div></div></div>
+          <div class="cp-body"><div id="featureToggles"></div></div>
+        </div>
+        <div class="cust-panel">
+          <div class="cp-head"><div class="cp-icon" style="background:var(--ambg);">💳</div><div><div class="cp-title">Payment Gateways</div></div></div>
+          <div class="cp-body"><div id="paymentToggles"></div></div>
+        </div>
+        <div class="cust-panel">
+          <div class="cp-head"><div class="cp-icon" style="background:var(--rbg);">👥</div><div><div class="cp-title">Admin Accounts</div><span class="pa" onclick="openModal('addAdmin')">+ Add Admin</span></div></div>
+          <div class="cp-body" style="padding:0 20px;"><table class="tbl" id="adminTbl"></table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALERTS -->
+    <div class="tab-panel fade-up" id="tab-alerts">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div style="font-size:13px;color:var(--t2);">5 unresolved alerts</div>
+        <button class="ab" style="background:var(--gbg);border-color:rgba(0,229,160,0.2);color:var(--green);" onclick="resolveAll()">✓ Resolve All</button>
+      </div>
+      <div id="fullAlerts"></div>
+    </div>
+
+  </div>
+</main>
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-ov" id="modal">
+  <div class="modal">
+    <div class="mh"><div class="mh-title" id="modalTitle">Add Vendor</div><div class="mc" onclick="closeModal()">×</div></div>
+    <div class="mb" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toastEl"><span id="toastIcon" style="font-size:16px;"></span><div><div id="toastText" style="font-size:12px;font-weight:500;"></div><div id="toastSub" style="font-size:10px;color:var(--t3);"></div></div></div>
+
+<script>
+// DATA
+const vendors=[
+  {id:'V001',name:'Zara India',emoji:'👗',cat:"Women's · Men's",status:'active',gmv:8420000,orders:2341,rating:4.8,stock:82,comm:10,city:'Mumbai',joined:'Jan 2024'},
+  {id:'V002',name:'Nike India',emoji:'👟',cat:'Sportswear',status:'active',gmv:12100000,orders:3102,rating:4.9,stock:68,comm:8,city:'Delhi',joined:'Nov 2023'},
+  {id:'V003',name:'FabIndia',emoji:'🧵',cat:'Ethnic',status:'active',gmv:3210000,orders:890,rating:4.7,stock:91,comm:12,city:'Jaipur',joined:'Mar 2024'},
+  {id:'V004',name:'Hidesign',emoji:'👜',cat:'Leather',status:'active',gmv:4800000,orders:1201,rating:4.9,stock:55,comm:10,city:'Pondicherry',joined:'Feb 2024'},
+  {id:'V005',name:'H&M India',emoji:'🧥',cat:'Fast Fashion',status:'active',gmv:9300000,orders:2890,rating:4.6,stock:74,comm:9,city:'Bengaluru',joined:'Dec 2023'},
+  {id:'V006',name:'Manyavar',emoji:'🥻',cat:'Ethnic Wedding',status:'pending',gmv:0,orders:0,rating:null,stock:0,comm:11,city:'Kolkata',joined:'Today'},
+  {id:'V007',name:'Blackberrys',emoji:'👔',cat:"Men's Formals",status:'suspended',gmv:1200000,orders:320,rating:3.8,stock:40,comm:10,city:'Delhi',joined:'Oct 2023'},
+  {id:'V008',name:'Tribe Amrapali',emoji:'💍',cat:'Jewellery',status:'active',gmv:2400000,orders:600,rating:4.8,stock:88,comm:12,city:'Jaipur',joined:'Apr 2024'},
+];
+const allOrders=[
+  {id:'FF-9001',vendor:'Zara India',customer:'Priya S.',item:'Floral Dress (M)',amount:2499,status:'new',time:'2m',city:'Mumbai'},
+  {id:'FF-9002',vendor:'Nike India',customer:'Rahul M.',item:'Air Max Pulse (9)',amount:8995,status:'packing',time:'5m',city:'Delhi'},
+  {id:'FF-9003',vendor:'FabIndia',customer:'Ananya P.',item:'Block Kurta (L)',amount:899,status:'dispatched',time:'18m',city:'Jaipur'},
+  {id:'FF-9004',vendor:'Hidesign',customer:'Vikram D.',item:'Leather Tote',amount:3799,status:'delivered',time:'32m',city:'Mumbai'},
+  {id:'FF-9005',vendor:'H&M India',customer:'Sneha K.',item:'Hoodie (XL)',amount:1299,status:'delivered',time:'45m',city:'Bengaluru'},
+  {id:'FF-9006',vendor:'Zara India',customer:'Meera J.',item:'Jeans (28)',amount:3199,status:'new',time:'1m',city:'Mumbai'},
+  {id:'FF-9007',vendor:'Nike India',customer:'Arjun N.',item:'Dri-FIT Tee',amount:2499,status:'packing',time:'8m',city:'Delhi'},
+];
+const alerts=[
+  {icon:'🚨',title:'Nike India — Stock Critical',sub:'Air Max Pulse out of stock · 140 pending orders affected',time:'2m',type:'crit'},
+  {icon:'⚠️',title:'Delivery SLA Breach — 12 Orders',sub:'Orders delayed beyond 60-min guarantee',time:'8m',type:'warn'},
+  {icon:'🔴',title:'Blackberrys — Vendor Suspended',sub:'Policy violation flagged by compliance',time:'1h',type:'crit'},
+  {icon:'💳',title:'Payment Gateway Timeout',sub:'Razorpay returning 504 errors · 3% failure rate',time:'22m',type:'crit'},
+  {icon:'📦',title:'FabIndia — 6 SKUs Out of Stock',sub:'Linen Kurta, Cotton Saree unavailable',time:'45m',type:'warn'},
+];
+const customers=[
+  {name:'Priya Sharma',city:'Mumbai',orders:12,ltv:28400,last:'Today',status:'vip'},
+  {name:'Rahul Mehta',city:'Delhi',orders:8,ltv:19200,last:'Yesterday',status:'active'},
+  {name:'Sneha Kapoor',city:'Bengaluru',orders:5,ltv:8900,last:'3d ago',status:'active'},
+  {name:'Arjun Nair',city:'Kochi',orders:21,ltv:42100,last:'Today',status:'vip'},
+  {name:'Divya Menon',city:'Chennai',orders:3,ltv:4200,last:'1w ago',status:'active'},
+];
+const riders=[
+  {name:'Amit Kumar',city:'Mumbai',trips:28,rating:4.9,earn:1960,ontime:'100%',status:'active'},
+  {name:'Pradeep Singh',city:'Delhi',trips:24,rating:4.7,earn:1680,ontime:'96%',status:'active'},
+  {name:'Ravi Mohan',city:'Bengaluru',trips:22,rating:4.8,earn:1540,ontime:'98%',status:'active'},
+  {name:'Suresh Rao',city:'Mumbai',trips:19,rating:4.6,earn:1330,ontime:'94%',status:'inactive'},
+];
+const payouts=[
+  {emoji:'👟',name:'Nike India',amount:1210000,due:'Today',status:'pending'},
+  {emoji:'👗',name:'Zara India',amount:842000,due:'Today',status:'pending'},
+  {emoji:'🧥',name:'H&M India',amount:930000,due:'Tomorrow',status:'processing'},
+];
+const ledger=[
+  {id:'TXN-001',type:'Commission',vendor:'Nike India',amount:96800,date:'Today 14:22',status:'settled'},
+  {id:'TXN-002',type:'Payout',vendor:'Zara India',amount:-842000,date:'Today 12:00',status:'processing'},
+  {id:'TXN-003',type:'Refund',vendor:'H&M India',amount:-2499,date:'Today 10:44',status:'settled'},
+  {id:'TXN-004',type:'Commission',vendor:'FabIndia',amount:38520,date:'Yesterday',status:'settled'},
+];
+const admins=[
+  {name:'Super Admin',email:'admin@flashfit.in',role:'Super Admin',last:'Now',status:'active'},
+  {name:'Ops Manager',email:'ops@flashfit.in',role:'Operations',last:'1h ago',status:'active'},
+  {name:'Finance Head',email:'finance@flashfit.in',role:'Finance',last:'3h ago',status:'active'},
+];
+const features=[
+  {label:'New Registrations',sub:'Allow new customers to sign up',on:true},
+  {label:'Vendor Onboarding',sub:'Accept new vendor applications',on:true},
+  {label:'60-Min Guarantee Badge',sub:'Show badge on site',on:true},
+  {label:'Try & Return',sub:'Allow 30-min return window',on:false},
+  {label:'Cash on Delivery',sub:'Allow COD payment option',on:true},
+  {label:'AI Fashion Stylist',sub:'Enable chat assistant on site',on:true},
+  {label:'Maintenance Mode',sub:'Show maintenance page',on:false},
+];
+const payments=[
+  {label:'Razorpay',icon:'💳',on:true},
+  {label:'UPI / GPay',icon:'📱',on:true},
+  {label:'Net Banking',icon:'🏦',on:true},
+  {label:'Cash on Delivery',icon:'💵',on:true},
+  {label:'EMI / BNPL',icon:'📅',on:false},
+];
+const riderPayData=[
+  {id:'R001',name:'Amit Kumar',city:'Mumbai',trips:28,earn:1960,pending:1960,bank:'HDFC •••• 4291',upi:'amit@hdfcbank',status:'pending',rating:4.9},
+  {id:'R002',name:'Pradeep Singh',city:'Delhi',trips:24,earn:1680,pending:1680,bank:'SBI •••• 7823',upi:'pradeep@oksbi',status:'pending',rating:4.7},
+  {id:'R003',name:'Ravi Mohan',city:'Bengaluru',trips:22,earn:1540,pending:1540,bank:'ICICI •••• 3341',upi:'ravi@icici',status:'pending',rating:4.8},
+  {id:'R004',name:'Suresh Rao',city:'Kochi',trips:19,earn:1330,pending:1330,bank:'Axis •••• 9912',upi:'suresh@axisbank',status:'pending',rating:4.6},
+  {id:'R005',name:'Karan Verma',city:'Jaipur',trips:16,earn:1120,pending:1120,bank:'HDFC •••• 6671',upi:'karan@paytm',status:'pending',rating:4.5},
+  {id:'R006',name:'Deepak Nair',city:'Chennai',trips:21,earn:1470,pending:0,bank:'Kotak •••• 2289',upi:'deepak@kotak',status:'paid',rating:4.7},
+  {id:'R007',name:'Manoj Sharma',city:'Mumbai',trips:18,earn:1260,pending:0,bank:'HDFC •••• 5531',upi:'manoj@hdfcbank',status:'paid',rating:4.8},
+];
+const payHistoryData=[
+  {icon:'💸',name:'Amit Kumar',amount:1960,method:'UPI',time:'Today 2:41 PM',status:'sent'},
+  {icon:'💸',name:'Pradeep Singh',amount:1680,method:'Bank Transfer',time:'Today 11:20 AM',status:'sent'},
+  {icon:'⏳',name:'Ravi Mohan',amount:1540,method:'UPI',time:'Processing',status:'processing'},
+  {icon:'💸',name:'Deepak Nair',amount:1470,method:'Bank Transfer',time:'Yesterday 6:10 PM',status:'sent'},
+  {icon:'❌',name:'Suresh Rao',amount:1330,method:'Bank Transfer',time:'Yesterday 2:12 PM',status:'failed'},
+];
+const gateways=[
+  {id:'razorpay',name:'Razorpay',icon:'💳',status:'operational',volume:3840000,txns:12481,success:98.2,fees:1.8},
+  {id:'upi',name:'UPI / NPCI',icon:'📱',status:'operational',volume:2910000,txns:9824,success:99.1,fees:0},
+  {id:'netbanking',name:'Net Banking',icon:'🏦',status:'operational',volume:820000,txns:1204,success:96.8,fees:2.5},
+  {id:'cod',name:'Cash on Delivery',icon:'💵',status:'active',volume:390000,txns:2200,success:100,fees:0},
+  {id:'emi',name:'EMI / BNPL',icon:'📅',status:'inactive',volume:0,txns:0,success:0,fees:2.9},
+  {id:'stripe',name:'Stripe (Intl)',icon:'🌐',status:'inactive',volume:0,txns:0,success:0,fees:2.9},
+];
+const txnMethods=[
+  {icon:'📱',name:'UPI',vol:2910000,pct:46,color:'#00c853'},
+  {icon:'💳',name:'Credit / Debit Card',vol:1920000,pct:30,color:'#3395ff'},
+  {icon:'🏦',name:'Net Banking',vol:820000,pct:13,color:'#ff9500'},
+  {icon:'💵',name:'Cash on Delivery',vol:390000,pct:6,color:'#ff6b35'},
+  {icon:'📅',name:'EMI / BNPL',vol:320000,pct:5,color:'#b06cff'},
+];
+const liveTxns=[
+  {id:'TXN-8821',method:'📱 UPI',customer:'Priya S.',amount:2499,status:'success',ago:'3s'},
+  {id:'TXN-8820',method:'💳 Card',customer:'Rahul M.',amount:8995,status:'success',ago:'12s'},
+  {id:'TXN-8819',method:'🏦 NetBanking',customer:'Ananya P.',amount:899,status:'failed',ago:'28s'},
+  {id:'TXN-8818',method:'📱 UPI',customer:'Vikram D.',amount:3799,status:'success',ago:'44s'},
+  {id:'TXN-8817',method:'💵 COD',customer:'Sneha K.',amount:1299,status:'success',ago:'1m'},
+];
+const failedTxns=[
+  {id:'TXN-8819',customer:'Ananya P.',amount:899,method:'Net Banking',reason:'Bank Timeout',gateway:'HDFC NetBanking',time:'28s ago'},
+  {id:'TXN-8801',customer:'Kiran R.',amount:4299,method:'Card',reason:'Insufficient Funds',gateway:'Razorpay',time:'8m ago'},
+  {id:'TXN-8798',customer:'Divya M.',amount:1599,method:'UPI',reason:'UPI Limit Exceeded',gateway:'NPCI',time:'14m ago'},
+  {id:'TXN-8791',customer:'Rohit V.',amount:8995,method:'Card',reason:'3D Secure Failed',gateway:'Razorpay',time:'22m ago'},
+];
+
+// STATE
+let selectedRiders=new Set();
+let currentPayPeriod='pending';
+
+// HELPERS
+function sBadge(s){const m={new:'bb',packing:'ba',dispatched:'ba',delivered:'bg',active:'bg',pending:'ba',suspended:'br',vip:'bb',inactive:'br',settled:'bg',processing:'ba'};const labels={new:'New',packing:'Packing',dispatched:'Dispatched',delivered:'Delivered',active:'Active',pending:'Pending',suspended:'Suspended',vip:'VIP',inactive:'Inactive',settled:'Settled',processing:'Processing'};return`<span class="badge ${m[s]||'bb'}"><span class="bd"></span>${labels[s]||s}</span>`;}
+
+// RENDERS
+function renderVendors(list){document.getElementById('vendorGrid').innerHTML=list.map(v=>`<div class="vc" onclick="openModal('vendorDetail','${v.id}')"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;"><div><div style="font-size:28px;margin-bottom:6px;">${v.emoji}</div><div class="vc-name">${v.name}</div><div class="vc-cat">${v.cat}</div></div>${sBadge(v.status)}</div><div style="font-size:10px;color:var(--t3);margin-bottom:4px;">📍 ${v.city} · Since ${v.joined}</div><div class="vc-stats"><div class="vs"><div class="vs-v" style="color:var(--green);">₹${(v.gmv/100000).toFixed(1)}L</div><div class="vs-l">GMV</div></div><div class="vs"><div class="vs-v">${v.orders.toLocaleString()}</div><div class="vs-l">Orders</div></div><div class="vs"><div class="vs-v" style="color:var(--amber);">${v.rating?v.rating+'★':'—'}</div><div class="vs-l">Rating</div></div><div class="vs"><div class="vs-v">${v.comm}%</div><div class="vs-l">Comm.</div></div></div><div class="vc-bar"><div class="vc-bf" style="width:${v.stock}%;background:${v.stock>60?'var(--green)':v.stock>30?'var(--amber)':'var(--red)'};"></div></div><div class="vc-acts"><div class="vb" onclick="event.stopPropagation();toast('📊','${v.name}','Opening analytics')">Analytics</div><div class="vb" onclick="event.stopPropagation();toast('📦','${v.name}','Opening inventory')">Inventory</div><div class="vb warn" onclick="event.stopPropagation();${v.status==='suspended'?`unsuspendV('${v.id}')`:`suspendV('${v.id}')`}">${v.status==='suspended'?'Reinstate':'Suspend'}</div></div></div>`).join('');}
+function filterVendors(q){renderVendors(vendors.filter(v=>v.name.toLowerCase().includes(q.toLowerCase())||v.cat.toLowerCase().includes(q.toLowerCase())));}
+function filterVS(s,btn){document.querySelectorAll('#tab-vendors .ab').forEach(b=>{b.style.background='';b.style.color='';b.style.borderColor='';});btn.style.background='var(--accent)';btn.style.color='#fff';btn.style.borderColor='var(--accent)';renderVendors(s==='all'?vendors:vendors.filter(v=>v.status===s));}
+function suspendV(id){const v=vendors.find(x=>x.id===id);if(v){v.status='suspended';renderVendors(vendors);toast('🔴',v.name,'Vendor suspended');}}
+function unsuspendV(id){const v=vendors.find(x=>x.id===id);if(v){v.status='active';renderVendors(vendors);toast('✅',v.name,'Vendor reinstated');}}
+function renderOrders(){document.getElementById('allOrdersTbl').innerHTML=`<thead><tr><th>Order ID</th><th>Vendor</th><th>Customer</th><th>Item</th><th>Amount</th><th>Status</th><th>City</th><th>Time</th></tr></thead><tbody>`+allOrders.map(o=>`<tr><td><span class="mono">${o.id}</span></td><td class="fw">${o.vendor}</td><td>${o.customer}</td><td style="font-size:11px;color:var(--t2);">${o.item}</td><td class="fw">₹${o.amount.toLocaleString('en-IN')}</td><td>${sBadge(o.status)}</td><td style="font-size:11px;color:var(--t3);">${o.city}</td><td><span class="mono">${o.time}</span></td></tr>`).join('')+`</tbody>`;}
+function renderInventoryVendors(){const list=[{emoji:'👗',name:'Zara India',skus:48,pct:82},{emoji:'👟',name:'Nike India',skus:62,pct:54},{emoji:'🧵',name:'FabIndia',skus:38,pct:91},{emoji:'👜',name:'Hidesign',skus:22,pct:55},{emoji:'🧥',name:'H&M India',skus:74,pct:68},{emoji:'💍',name:'Tribe Amrapali',skus:31,pct:44}];document.getElementById('invVendorList').innerHTML=list.map(i=>`<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--b1);"><div style="width:36px;height:36px;border-radius:9px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:18px;">${i.emoji}</div><div style="width:110px;"><div style="font-size:13px;font-weight:500;">${i.name}</div><div style="font-size:11px;color:var(--t3);">${i.skus} SKUs</div></div><div style="flex:1;background:var(--s3);height:6px;border-radius:100px;overflow:hidden;margin:0 10px;"><div style="height:100%;border-radius:100px;background:${i.pct>70?'var(--green)':i.pct>45?'var(--amber)':'var(--red)'};width:${i.pct}%;"></div></div><div style="font-family:var(--mono);font-size:11px;color:var(--t2);min-width:36px;">${i.pct}%</div><span class="badge ${i.pct>70?'bg':i.pct>45?'ba':'br'}">${i.pct>70?'Healthy':i.pct>45?'Moderate':'Low'}</span></div>`).join('');}
+function renderInvItems(){const items=[{v:'Nike India',e:'👟',n:'Air Max Pulse (Size 8)',sku:'NK-AMP-008',s:0,m:30},{v:'Zara India',e:'👗',n:'Oversized Blazer (S)',sku:'ZA-OBL-S01',s:1,m:20},{v:'H&M India',e:'🧥',n:'Winter Parka (L)',sku:'HM-WPK-L03',s:3,m:40},{v:'FabIndia',e:'🧵',n:'Linen Kurta (XL)',sku:'FI-LKT-XL2',s:0,m:30},{v:'Hidesign',e:'👜',n:'Leather Wallet',sku:'HD-LWT-BK1',s:4,m:15}];document.getElementById('invTbl').innerHTML=`<thead><tr><th>Vendor</th><th>Item</th><th>SKU</th><th>Stock</th><th>Max</th><th>Status</th><th>Action</th></tr></thead><tbody>`+items.map(i=>`<tr><td><span style="font-size:16px;">${i.e}</span> <span class="fw" style="margin-left:6px;">${i.v}</span></td><td>${i.n}</td><td><span class="mono">${i.sku}</span></td><td class="fw" style="color:${i.s===0?'var(--red)':i.s<5?'var(--amber)':'var(--green)'};">${i.s}</td><td style="color:var(--t3);">${i.m}</td><td>${i.s===0?'<span class="badge br"><span class="bd"></span>Out of Stock</span>':'<span class="badge ba"><span class="bd"></span>Low Stock</span>'}</td><td><button class="ab" style="font-size:10px;padding:5px 10px;background:var(--gbg);border-color:rgba(0,229,160,0.2);color:var(--green);" onclick="toast('📦','Restock sent','Vendor notified')">Notify Vendor</button></td></tr>`).join('')+`</tbody>`;}
+function renderAlerts(id,list){document.getElementById(id).innerHTML=list.map(a=>`<div style="display:flex;align-items:flex-start;gap:12px;background:${a.type==='crit'?'rgba(255,77,106,0.04)':'var(--s2)'};border:1px solid ${a.type==='crit'?'rgba(255,77,106,0.25)':'var(--b1)'};border-radius:10px;padding:12px 14px;margin-bottom:10px;cursor:pointer;" onclick="toast('🔍','Investigating','${a.title}')"><div style="width:32px;height:32px;border-radius:8px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">${a.icon}</div><div style="flex:1"><div style="font-size:12px;font-weight:600;margin-bottom:2px;">${a.title}</div><div style="font-size:11px;color:var(--t3);">${a.sub}</div></div><div style="font-family:var(--mono);font-size:10px;color:var(--t3);flex-shrink:0;">${a.time}</div></div>`).join('');}
+function renderTopVendors(){const sorted=[...vendors].filter(v=>v.status==='active').sort((a,b)=>b.gmv-a.gmv).slice(0,5);document.getElementById('topVendorTbl').innerHTML=`<thead><tr><th>#</th><th>Vendor</th><th>GMV</th><th>Orders</th><th>Rating</th></tr></thead><tbody>`+sorted.map((v,i)=>`<tr><td style="color:${i<3?'var(--amber)':'var(--t3)'};font-size:11px;">${i<3?'🏆':i+1}</td><td><span style="font-size:16px;">${v.emoji}</span> <span class="fw" style="margin-left:6px;">${v.name}</span></td><td class="fw" style="color:var(--green);">₹${(v.gmv/100000).toFixed(1)}L</td><td>${v.orders.toLocaleString()}</td><td style="color:var(--amber);">${v.rating}★</td></tr>`).join('')+`</tbody>`;}
+function renderHealthPanel(){const items=[{l:'API Uptime',v:'99.98%',ok:true},{l:'Response Time',v:'142ms',ok:true},{l:'Payment Gateway',v:'Degraded',ok:false},{l:'Rider App',v:'Operational',ok:true},{l:'Push Notifications',v:'Operational',ok:true}];document.getElementById('healthPanel').innerHTML=items.map(i=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--b1);"><span style="font-size:12px;color:var(--t2);">${i.l}</span><span style="font-size:12px;font-weight:600;color:${i.ok?'var(--green)':'var(--red)'};">${i.v}</span></div>`).join('');}
+function renderPayouts(){document.getElementById('payoutList').innerHTML=payouts.map(p=>`<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--b1);"><div style="width:34px;height:34px;border-radius:9px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:16px;">${p.emoji}</div><div><div style="font-size:12px;font-weight:500;">${p.name}</div><div style="font-size:10px;color:var(--t3);">Due ${p.due}</div></div><div style="margin-left:auto;font-family:var(--display);font-size:16px;font-weight:700;color:var(--green);">₹${(p.amount/100000).toFixed(1)}L</div><button class="ab pr" style="font-size:10px;" onclick="toast('💸','Payout initiated','${p.name} payment processing')">Pay Now</button></div>`).join('');}
+function renderLedger(){document.getElementById('ledgerTbl').innerHTML=`<thead><tr><th>TXN ID</th><th>Type</th><th>Vendor</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead><tbody>`+ledger.map(t=>`<tr><td><span class="mono">${t.id}</span></td><td style="font-size:11px;color:var(--t2);">${t.type}</td><td>${t.vendor}</td><td class="fw" style="color:${t.amount<0?'var(--red)':'var(--green)'};">${t.amount<0?'−':'+'}₹${Math.abs(t.amount).toLocaleString('en-IN')}</td><td><span class="mono">${t.date}</span></td><td>${sBadge(t.status)}</td></tr>`).join('')+`</tbody>`;}
+function renderCustomers(){document.getElementById('custTbl').innerHTML=`<thead><tr><th>Customer</th><th>City</th><th>Orders</th><th>LTV</th><th>Last Order</th><th>Status</th></tr></thead><tbody>`+customers.map(c=>`<tr><td class="fw">${c.name}</td><td style="color:var(--t2);">${c.city}</td><td>${c.orders}</td><td style="color:var(--green);font-weight:600;">₹${c.ltv.toLocaleString('en-IN')}</td><td><span class="mono">${c.last}</span></td><td>${sBadge(c.status)}</td></tr>`).join('')+`</tbody>`;}
+function renderRiders(){document.getElementById('riderTbl').innerHTML=`<thead><tr><th>#</th><th>Rider</th><th>City</th><th>Trips</th><th>Earnings</th><th>Rating</th><th>On-Time</th><th>Status</th></tr></thead><tbody>`+riders.map((r,i)=>`<tr><td style="color:${i<3?'var(--amber)':'var(--t3)'};">${i<3?'🏆':i+1}</td><td class="fw">${r.name}</td><td style="color:var(--t2);">${r.city}</td><td>${r.trips}</td><td style="color:var(--green);font-weight:600;">₹${r.earn}</td><td style="color:var(--amber);">${r.rating}★</td><td>${r.ontime}</td><td>${sBadge(r.status)}</td></tr>`).join('')+`</tbody>`;}
+function renderAdmins(){document.getElementById('adminTbl').innerHTML=`<thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Last Active</th><th>Status</th></tr></thead><tbody>`+admins.map(a=>`<tr><td class="fw">${a.name}</td><td><span class="mono">${a.email}</span></td><td>${a.role}</td><td><span class="mono">${a.last}</span></td><td>${sBadge(a.status)}</td></tr>`).join('')+`</tbody>`;}
+function renderFeatureToggles(){document.getElementById('featureToggles').innerHTML=features.map((f,i)=>`<div class="toggle-row"><div><div class="tr-label">${f.label}</div>${f.sub?`<div class="tr-sub">${f.sub}</div>`:''}</div><div class="toggle ${f.on?'on':''}" onclick="this.classList.toggle('on');this.querySelector('.tg-thumb').style.left=this.classList.contains('on')?'21px':'3px';toast('⚙️','${f.label}',this.classList.contains('on')?'Enabled':'Disabled')"><div class="tg-thumb" style="left:${f.on?'21px':'3px'}"></div></div></div>`).join('');}
+function renderPaymentToggles(){document.getElementById('paymentToggles').innerHTML=payments.map((p,i)=>`<div class="toggle-row"><div style="display:flex;align-items:center;gap:8px;"><div style="font-size:18px;">${p.icon}</div><div class="tr-label">${p.label}</div></div><div class="toggle ${p.on?'on':''}" onclick="this.classList.toggle('on');this.querySelector('.tg-thumb').style.left=this.classList.contains('on')?'21px':'3px';toast('💳','${p.label}',this.classList.contains('on')?'Enabled':'Disabled')"><div class="tg-thumb" style="left:${p.on?'21px':'3px'}"></div></div></div>`).join('');}
+
+// PAY RIDERS
+function renderRiderPayCards(){const filtered=currentPayPeriod==='pending'?riderPayData.filter(r=>r.status==='pending'):currentPayPeriod==='today'?riderPayData.filter(r=>r.status==='paid'):riderPayData;document.getElementById('riderPayCards').innerHTML=filtered.map(r=>`<div class="rider-pay-card ${selectedRiders.has(r.id)?'selected':''}" id="rpc-${r.id}"><div class="rpc-check ${selectedRiders.has(r.id)?'on':''}" onclick="toggleRiderSelect('${r.id}')">${selectedRiders.has(r.id)?'✓':''}</div><div class="rpc-ava">${r.name.split(' ').map(w=>w[0]).join('')}</div><div style="flex:1;"><div class="rpc-name">${r.name}</div><div class="rpc-meta">${r.city} · ${r.bank} · ${r.upi}</div><div style="display:flex;align-items:center;gap:8px;margin-top:4px;"><span style="font-size:11px;color:var(--amber);">${r.rating}★</span><span style="font-size:11px;color:var(--t3);">${r.trips} trips</span></div></div><div style="text-align:center;margin:0 16px;"><div style="font-family:var(--display);font-size:20px;font-weight:700;">${r.trips}</div><div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;">Trips</div></div><div style="margin-right:12px;text-align:right;"><div class="rpc-earn-v">₹${r.earn.toLocaleString('en-IN')}</div><div class="rpc-earn-l">${r.status==='paid'?'Paid':'Pending'}</div></div><div>${r.status==='paid'?'<button class="rpc-pay-btn paid">✓ Paid</button>':`<button class="rpc-pay-btn" onclick="payRider('${r.id}')">Pay ₹${r.pending.toLocaleString('en-IN')}</button>`}</div></div>`).join('');}
+function toggleRiderSelect(id){if(selectedRiders.has(id))selectedRiders.delete(id);else selectedRiders.add(id);updateBulkBar();renderRiderPayCards();}
+function updateBulkBar(){const sel=[...selectedRiders].map(id=>riderPayData.find(r=>r.id===id)).filter(Boolean);const total=sel.reduce((s,r)=>s+r.pending,0);document.getElementById('selectedCount').textContent=sel.length;document.getElementById('selectedTotal').textContent='₹'+total.toLocaleString('en-IN');const btn=document.getElementById('bulkPayBtn');btn.disabled=sel.length===0;btn.style.opacity=sel.length>0?'1':'0.5';}
+function selectAllRiders(){riderPayData.filter(r=>r.status==='pending').forEach(r=>selectedRiders.add(r.id));updateBulkBar();renderRiderPayCards();}
+function clearSelection(){selectedRiders.clear();updateBulkBar();renderRiderPayCards();}
+function payRider(id){const r=riderPayData.find(x=>x.id===id);if(!r||r.status==='paid')return;const btn=document.querySelector(`#rpc-${id} .rpc-pay-btn`);if(btn){btn.textContent='⏳ Processing…';btn.className='rpc-pay-btn processing';btn.disabled=true;}setTimeout(()=>{r.status='paid';r.pending=0;selectedRiders.delete(id);renderRiderPayCards();updateBulkBar();toast('💸',`Paid ${r.name}`,`₹${r.earn.toLocaleString('en-IN')} sent via UPI`);},1800);}
+function processBulkPay(){const sel=[...selectedRiders];if(!sel.length)return;const btn=document.getElementById('bulkPayBtn');btn.innerHTML='<span style="display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;vertical-align:middle;"></span>Processing…';btn.disabled=true;setTimeout(()=>{const total=sel.map(id=>riderPayData.find(r=>r.id===id)).filter(Boolean).reduce((s,r)=>s+r.pending,0);sel.forEach(id=>{const r=riderPayData.find(x=>x.id===id);if(r){r.status='paid';r.pending=0;}});selectedRiders.clear();renderRiderPayCards();updateBulkBar();btn.innerHTML='💸 Pay Selected';btn.disabled=false;toast('🎉','Bulk payout complete',`₹${total.toLocaleString('en-IN')} sent to ${sel.length} riders`);},2200);}
+function setPayPeriod(period,el){currentPayPeriod=period;document.querySelectorAll('.ppt').forEach(p=>p.classList.remove('on'));el.classList.add('on');renderRiderPayCards();}
+function renderPayHistory(){document.getElementById('payHistory').innerHTML=payHistoryData.map(h=>`<div class="pay-history-row"><div style="width:36px;height:36px;border-radius:10px;background:${h.status==='sent'?'var(--gbg)':h.status==='failed'?'var(--rbg)':'var(--ambg)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">${h.icon}</div><div style="flex:1;"><div style="font-size:12px;font-weight:600;">${h.name}</div><div style="font-size:10px;color:var(--t3);">${h.method} · ${h.time}</div></div><div style="font-weight:700;font-size:14px;color:${h.status==='sent'?'var(--green)':h.status==='failed'?'var(--red)':'var(--amber)'};">${h.status==='failed'?'❌ ':''}₹${h.amount.toLocaleString('en-IN')}</div></div>`).join('');}
+
+// GATEWAY
+function renderGwCards(){document.getElementById('gwCards').innerHTML=gateways.map(g=>`<div class="gw-card ${g.status!=='inactive'?'active-gw':''}"><div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;"><div><div style="font-size:28px;margin-bottom:6px;">${g.icon}</div><div class="gw-name">${g.name}</div><div class="gw-sub">MDR: ${g.fees}% · ${g.txns.toLocaleString()} txns</div></div><div><div class="gw-health ${g.status!=='inactive'?'ok':''}"><span class="gw-dot ${g.status!=='inactive'?'ok':''}"></span>${g.status==='operational'?'Operational':g.status==='active'?'Active':'Inactive'}</div><div style="margin-top:8px;"><div class="toggle ${g.status!=='inactive'?'on':''}" onclick="toggleGateway('${g.id}',this)"><div class="tg-thumb" style="left:${g.status!=='inactive'?'21px':'3px'}"></div></div></div></div></div>${g.status!=='inactive'?`<div class="gw-stats"><div class="gws"><div class="gws-v" style="color:var(--green);">₹${(g.volume/100000).toFixed(1)}L</div><div class="gws-l">Volume</div></div><div class="gws"><div class="gws-v">${g.txns.toLocaleString()}</div><div class="gws-l">Txns</div></div><div class="gws"><div class="gws-v" style="color:${g.success>97?'var(--green)':g.success>94?'var(--amber)':'var(--red)'};">${g.success}%</div><div class="gws-l">Success</div></div></div><button class="gw-config-btn primary" style="width:100%;margin-top:8px;" onclick="openModal('gwConfig','${g.id}')">Configure →</button>`:`<div style="font-size:12px;color:var(--t3);margin-top:10px;padding:10px;background:var(--s3);border-radius:8px;">Not enabled. Toggle on to activate.</div>`}</div>`).join('');}
+function toggleGateway(id,el){el.classList.toggle('on');el.querySelector('.tg-thumb').style.left=el.classList.contains('on')?'21px':'3px';const gw=gateways.find(g=>g.id===id);if(gw){gw.status=el.classList.contains('on')?'operational':'inactive';renderGwCards();}toast('💳',gw?.name||'Gateway',el.classList.contains('on')?'Enabled':'Disabled');}
+function renderTxnMethods(){document.getElementById('txnMethodList').innerHTML=txnMethods.map(m=>`<div class="txn-method-row"><div style="display:flex;align-items:center;gap:10px;"><div style="font-size:20px;">${m.icon}</div><div><div style="font-size:13px;font-weight:600;">${m.name}</div><div style="font-size:11px;color:var(--t3);">₹${(m.vol/100000).toFixed(1)}L</div></div></div><div class="tmr-bar"><div class="tmr-bar-fill" style="width:${m.pct}%;background:${m.color};"></div></div><div style="font-family:var(--mono);font-size:12px;font-weight:700;min-width:36px;text-align:right;color:${m.color};">${m.pct}%</div></div>`).join('');}
+function renderLiveTxnFeed(){document.getElementById('liveTxnFeed').innerHTML=liveTxns.map(t=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--b1);"><div style="font-size:16px;">${t.status==='success'?'✅':t.status==='failed'?'❌':'⏳'}</div><div style="flex:1;"><div style="font-size:12px;font-weight:600;">${t.customer} · ${t.method}</div><div style="font-size:10px;color:var(--t3);">${t.id} · ${t.ago} ago</div></div><div style="font-size:13px;font-weight:700;color:${t.status==='success'?'var(--green)':t.status==='failed'?'var(--red)':'var(--amber)'};">₹${t.amount.toLocaleString('en-IN')}</div></div>`).join('');}
+function renderFailedTxns(){document.getElementById('failedTxnTbl').innerHTML=`<thead><tr><th>TXN ID</th><th>Customer</th><th>Amount</th><th>Method</th><th>Failure Reason</th><th>Gateway</th><th>Time</th><th>Action</th></tr></thead><tbody>`+failedTxns.map(t=>`<tr><td><span class="mono">${t.id}</span></td><td class="fw">${t.customer}</td><td style="color:var(--red);font-weight:700;">₹${t.amount.toLocaleString('en-IN')}</td><td>${t.method}</td><td><span class="badge br"><span class="bd"></span>${t.reason}</span></td><td style="color:var(--t2);font-size:11px;">${t.gateway}</td><td><span class="mono">${t.time}</span></td><td><button class="ab" style="font-size:10px;padding:5px 10px;" onclick="toast('🔄','Retrying','Retrying ${t.id}…')">Retry</button></td></tr>`).join('')+`</tbody>`;}
+
+// BRANDING + LOCALSTORAGE SETTINGS ENGINE
+const SETTINGS_KEY = 'fr_admin_settings';
+function getSettings(){try{return JSON.parse(localStorage.getItem(SETTINGS_KEY))||{};}catch(e){return {};}}
+function saveSettings(patch){const c=getSettings();localStorage.setItem(SETTINGS_KEY,JSON.stringify(Object.assign({},c,patch)));localStorage.setItem('fr_settings_ts',Date.now().toString());}
+
+function loadSavedSettings(){
+  try {
+    const s=getSettings();
+    const safe=(id)=>document.getElementById(id);
+    if(s.accentColor){
+      document.documentElement.style.setProperty('--accent',s.accentColor);
+      if(safe('customColor')) safe('customColor').value=s.accentColor;
+      if(safe('colorDot')) safe('colorDot').style.background=s.accentColor;
+      if(safe('colorPreview')) safe('colorPreview').style.background=s.accentColor;
+    }
+    if(s.brandName  && safe('brandName'))  safe('brandName').value=s.brandName;
+    if(s.aiName     && safe('aiName'))     safe('aiName').value=s.aiName;
+    if(s.aiPersona  && safe('aiPersona'))  safe('aiPersona').value=s.aiPersona;
+    if(s.bannerText && safe('bannerText')) { safe('bannerText').value=s.bannerText; if(safe('bannerPreview')) safe('bannerPreview').textContent=s.bannerText; }
+    if(s.bannerBg   && safe('bannerPreview')) safe('bannerPreview').style.background=s.bannerBg;
+    if(s.bannerVisible===false){ const t=safe('bannerToggle'); if(t){t.classList.remove('on');t.querySelector('.tg-thumb').style.left='3px';} }
+    liveUpdateBrand();
+  } catch(e){ console.warn('loadSavedSettings error:',e); }
+}
+
+function liveUpdateBrand(){
+  const name=document.getElementById('brandName').value||'Fresh Republic';
+  const ai=document.getElementById('aiName').value||'Priya';
+  const persona=document.getElementById('aiPersona').value||'Fashion Stylist';
+  document.getElementById('brandPreview').innerHTML=`<img src="fr-logo-text.png" style="height:24px;object-fit:contain;filter:invert(1);"> <span style="font-size:12px;color:var(--t2);margin-left:6px;">${name}</span>`;
+  document.getElementById('aiPreview').textContent=`AI Stylist: ${ai} · ${persona}`;
+  const sbEl=document.getElementById('sbLogo');
+  if(sbEl) sbEl.innerHTML=`<img src="fr-logo-text.png" style="height:15px;object-fit:contain;filter:invert(1);vertical-align:middle;"> <span style="font-size:9px;color:var(--t3);font-family:var(--sans);font-weight:400;margin-left:4px;">ADMIN</span>`;
+}
+
+function setAccent(color,el){
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('on'));
+  if(el) el.classList.add('on');
+  document.getElementById('customColor').value=color;
+  document.getElementById('colorDot').style.background=color;
+  document.getElementById('colorPreview').style.background=color;
+  document.documentElement.style.setProperty('--accent',color);
+  saveSettings({accentColor:color});
+  toast('🎨','Accent color saved',`${color} — reload other panels to apply`);
+}
+function setAccentCustom(v){
+  if(/^#[0-9a-fA-F]{6}$/.test(v)){
+    document.getElementById('colorDot').style.background=v;
+    document.getElementById('colorPreview').style.background=v;
+    document.documentElement.style.setProperty('--accent',v);
+    document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('on'));
+    saveSettings({accentColor:v});
+  }
+}
+function setTheme(panel,theme,el){
+  el.closest('.cfg').querySelectorAll('.theme-card').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  saveSettings({[`theme_${panel}`]:theme});
+  toast('🌗','Theme saved',`${panel} → ${theme} — reload that panel to apply`);
+}
+function setFont(font,el){
+  document.querySelectorAll('.font-opt').forEach(f=>f.classList.remove('on'));
+  el.classList.add('on');
+  saveSettings({displayFont:font});
+  toast('Aa','Font saved',`Display font → ${font} — reload panels to apply`);
+}
+function updateBannerPreview(){
+  const txt=document.getElementById('bannerText').value;
+  document.getElementById('bannerPreview').textContent=txt;
+}
+function setBannerBg(color,el){
+  el.closest('.cfg').querySelectorAll('.swatch').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('bannerPreview').style.background=color;
+  saveSettings({bannerBg:color});
+}
+function toggleBanner(el){
+  el.classList.toggle('on');
+  el.querySelector('.tg-thumb').style.left=el.classList.contains('on')?'21px':'3px';
+  const visible=el.classList.contains('on');
+  saveSettings({bannerVisible:visible});
+  toast('📢','Banner '+(visible?'shown':'hidden'),'Customer site will update on reload');
+}
+function applyBranding(){
+  const name   =document.getElementById('brandName').value||'Fresh Republic';
+  const aiName =document.getElementById('aiName').value||'Priya';
+  const persona=document.getElementById('aiPersona').value||'Fashion Stylist';
+  const banner =document.getElementById('bannerText').value;
+  saveSettings({brandName:name,aiName,aiPersona:persona,bannerText:banner});
+  liveUpdateBrand();
+  toast('✅','All settings saved!','Reload other panels to see changes applied');
+}
+function resetBranding(){
+  localStorage.removeItem(SETTINGS_KEY);
+  document.getElementById('brandName').value='Fresh Republic';
+  document.getElementById('aiName').value='Priya';
+  document.getElementById('bannerText').value='⚡ Free delivery on first order · 60-minute guarantee or next order free';
+  setAccent('#5b6cff',document.querySelector('.swatch'));
+  liveUpdateBrand();
+  toast('↺','Reset complete','All settings restored to defaults');
+}
+
+// MODALS
+function openModal(type,data){
+  let title='',body='';
+  if(type==='addVendor'){title='Add New Vendor';body=`<div style="display:flex;flex-direction:column;gap:14px;"><div><label class="cfl">Store Name</label><input class="cfi" placeholder="e.g. Fabindia – New Delhi"/></div><div><label class="cfl">Category</label><input class="cfi" placeholder="e.g. Women's · Ethnic"/></div><div><label class="cfl">City</label><input class="cfi" placeholder="e.g. Mumbai"/></div><div><label class="cfl">Contact Email</label><input class="cfi" placeholder="vendor@brand.com"/></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div><label class="cfl">Commission (%)</label><input class="cfi" value="10" type="number"/></div><div><label class="cfl">Status</label><select class="cfi"><option>active</option><option>pending</option></select></div></div><div style="display:flex;gap:10px;"><button class="ab pr" style="flex:1;" onclick="toast('🏪','Vendor added','New vendor submitted');closeModal()">Add Vendor</button><button class="ab" onclick="closeModal()">Cancel</button></div></div>`;}
+  else if(type==='vendorDetail'){const v=vendors.find(x=>x.id===data);if(!v)return;title=`${v.emoji} ${v.name}`;body=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">${[['GMV','₹'+(v.gmv/100000).toFixed(1)+'L'],['Orders',v.orders.toLocaleString()],['Rating',v.rating?v.rating+'★':'Not rated'],['Commission',v.comm+'%'],['City',v.city],['Status',v.status]].map(([l,val])=>`<div style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:12px;"><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">${l}</div><div style="font-size:14px;font-weight:600;">${val}</div></div>`).join('')}</div><div style="display:flex;gap:8px;"><button class="ab pr" onclick="toast('✅','Payout approved');closeModal()">Approve Payout</button><button class="ab" onclick="toast('📧','Message sent');closeModal()">Send Message</button><button class="ab danger" onclick="suspendV('${v.id}');closeModal()">Suspend</button></div>`;}
+  else if(type==='addAdmin'){title='Add Admin Account';body=`<div style="display:flex;flex-direction:column;gap:14px;"><div><label class="cfl">Full Name</label><input class="cfi" placeholder="e.g. Rahul Sharma"/></div><div><label class="cfl">Email</label><input class="cfi" placeholder="rahul@flashfit.in"/></div><div><label class="cfl">Role</label><select class="cfi"><option>Operations</option><option>Finance</option><option>Support</option></select></div><div><label class="cfl">Temporary Password</label><input class="cfi" type="password" placeholder="••••••••"/></div><div style="display:flex;gap:10px;"><button class="ab pr" style="flex:1;" onclick="toast('👥','Admin created','Account created & email sent');closeModal()">Create Account</button><button class="ab" onclick="closeModal()">Cancel</button></div></div>`;}
+  else if(type==='gwConfig'){const gw=gateways.find(g=>g.id===data);if(!gw)return;title=`${gw.icon} ${gw.name} — Config`;body=`<div style="display:flex;flex-direction:column;gap:14px;"><div><label class="cfl">Webhook Secret</label><input class="cfi" value="wh_secret_••••••••" style="font-family:var(--mono);font-size:12px;"/></div><div><label class="cfl">Refund Mode</label><select class="cfi"><option>Instant Refund</option><option>3–5 Business Days</option></select></div><div><label class="cfl">Currency</label><select class="cfi"><option>INR</option><option>USD</option><option>Both</option></select></div><div style="display:flex;gap:10px;"><button class="ab pr" style="flex:1;" onclick="toast('✅','${gw.name} saved','Gateway config updated');closeModal()">Save Config</button><button class="ab" onclick="closeModal()">Cancel</button></div></div>`;}
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalBody').innerHTML=body;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+// SIDEBAR TOGGLE (mobile)
+function toggleSidebar(){
+  const sb=document.querySelector('.sb');
+  const hb=document.getElementById('hamburger');
+  const ov=document.getElementById('sbOverlay');
+  sb.classList.toggle('open');
+  hb.classList.toggle('open');
+  ov.classList.toggle('show');
+}
+function closeSidebar(){
+  document.querySelector('.sb').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.getElementById('sbOverlay').classList.remove('show');
+}
+
+// NAVIGATION
+const tabTitles={overview:'Platform Overview',vendors:'Vendor Management',orders:'All Orders',inventory:'Inventory Control',analytics:'Analytics',finance:'Finance & Payouts','pay-riders':'Pay Riders','payment-gw':'Payment Gateway',customers:'Customer Directory',riders:'Rider Management',branding:'Branding & Theme',platform:'Platform Config',alerts:'System Alerts'};
+function goTab(id,el){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));const tab=document.getElementById('tab-'+id);if(tab){tab.classList.add('on');tab.classList.remove('fade-up');void tab.offsetWidth;tab.classList.add('fade-up');}if(el)el.classList.add('on');document.getElementById('tbTitle').textContent=tabTitles[id]||id;closeSidebar();}
+function resolveAll(){document.getElementById('fullAlerts').innerHTML=`<div style="text-align:center;padding:40px;color:var(--t3);"><div style="font-size:40px;margin-bottom:12px;">✅</div><div>All alerts resolved</div></div>`;toast('✅','All Clear','All 5 alerts resolved');}
+
+// CHARTS
+function initCharts(){
+  const gc='rgba(255,255,255,0.04)',tc='#4a5070';
+  Chart.defaults.color=tc;Chart.defaults.font.family="'Satoshi',sans-serif";
+  new Chart('revenueChart',{type:'line',data:{labels:Array.from({length:30},(_,i)=>i+1+''),datasets:[{data:[18,21,19,24,22,28,25,31,29,34,32,38,35,42,39,45,43,50,48,54,52,58,55,62,59,65,63,70,67,74],borderColor:'var(--accent)',backgroundColor:'rgba(91,108,255,0.06)',borderWidth:2,tension:0.4,fill:true,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:gc},ticks:{maxTicksLimit:8,font:{size:10}}},y:{grid:{color:gc},ticks:{callback:v=>'₹'+(v/100)+'L',font:{size:10}}}}}});
+  new Chart('statusDonut',{type:'doughnut',data:{labels:['New','Packing','Dispatched','Delivered','Cancelled'],datasets:[{data:[847,3241,2100,12891,134],backgroundColor:['#3b82f6','#ffb830','#00d4ff','#00e5a0','#ff4d6a'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:10},padding:10}}},cutout:'62%'}});
+  new Chart('invChart',{type:'bar',data:{labels:["Women's","Men's","Footwear","Bags","Ethnic","Accessories"],datasets:[{label:'In Stock',data:[340,220,180,95,210,140],backgroundColor:'rgba(0,229,160,0.7)',borderRadius:4},{label:'Low/Out',data:[42,31,58,18,24,22],backgroundColor:'rgba(255,77,106,0.7)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:gc},ticks:{font:{size:10}}}}}});
+  const months=['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+  new Chart('gmvChart',{type:'line',data:{labels:months,datasets:[{data:[18,22,25,28,31,36,40,45,52,58,62,74],borderColor:'#5b6cff',backgroundColor:'rgba(91,108,255,0.08)',borderWidth:2,tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:'#5b6cff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:gc},ticks:{font:{size:10}}},y:{grid:{color:gc},ticks:{callback:v=>'₹'+v+'Cr',font:{size:10}}}}}});
+  new Chart('custChart',{type:'bar',data:{labels:months,datasets:[{label:'New',data:[4200,4800,5100,5400,5800,6200,6800,7100,7600,8200,8800,9400],backgroundColor:'rgba(91,108,255,0.8)',borderRadius:4},{label:'Returning',data:[8100,8800,9400,10200,11000,12100,13000,14200,15400,16800,18200,19600],backgroundColor:'rgba(0,229,160,0.6)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:gc},ticks:{font:{size:10}}}}}});
+  new Chart('cityChart',{type:'bar',data:{labels:['Mumbai','Delhi','Bengaluru','Jaipur','Kolkata','Chennai'],datasets:[{data:[4820,4210,3890,2140,1980,1760],backgroundColor:'rgba(0,212,255,0.7)',borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:gc},ticks:{font:{size:10}}},y:{grid:{display:false},ticks:{font:{size:10}}}}}});
+  new Chart('catChart',{type:'doughnut',data:{labels:["Women's","Footwear","Men's","Ethnic","Bags","Accessories"],datasets:[{data:[38,22,18,10,8,4],backgroundColor:['#5b6cff','#00e5a0','#00d4ff','#ffb830','#ff4d6a','#a78bfa'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:10},padding:8}}},cutout:'55%'}});
+  new Chart('finChart',{type:'doughnut',data:{labels:['Vendor Payouts','Commission','Delivery Fees','Refunds','Net Profit'],datasets:[{data:[57.6,10,5.5,2.8,21.4],backgroundColor:['#3b82f6','#5b6cff','#00d4ff','#ff4d6a','#00e5a0'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:10},padding:10}}},cutout:'60%'}});
+  // Payout history chart
+  new Chart('payoutHistoryChart',{type:'bar',data:{labels:['W1','W2','W3','W4','W5','W6','W7','W8'],datasets:[{label:'Paid (₹)',data:[28000,31000,27500,34000,29000,38000,33000,41000],backgroundColor:'rgba(0,229,160,0.7)',borderRadius:5},{label:'Pending (₹)',data:[12000,8000,14000,6000,11000,4000,9000,12400],backgroundColor:'rgba(255,184,48,0.5)',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:gc},ticks:{callback:v=>'₹'+(v/1000)+'k',font:{size:10}}}}}});
+  // Gateway volume chart
+  new Chart('gwVolumeChart',{type:'doughnut',data:{labels:txnMethods.map(m=>m.name),datasets:[{data:txnMethods.map(m=>m.vol),backgroundColor:txnMethods.map(m=>m.color),borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'60%'}});
+  // Live feed ticker
+  setInterval(()=>{const methods=['📱 UPI','💳 Card','🏦 NetBanking','💵 COD'];const names=['Priya S.','Rahul M.','Sneha K.','Arjun N.','Divya R.'];const amt=Math.floor(Math.random()*8000)+500;const ok=Math.random()>0.05;liveTxns.unshift({id:'TXN-'+Math.floor(Math.random()*9000+1000),method:methods[Math.floor(Math.random()*methods.length)],customer:names[Math.floor(Math.random()*names.length)],amount:amt,status:ok?'success':'failed',ago:'just now'});if(liveTxns.length>8)liveTxns.pop();liveTxns.forEach((t,i)=>{if(i>0)t.ago=i<3?i*15+'s ago':Math.floor(i/2)+'m ago';});if(document.getElementById('tab-payment-gw').classList.contains('on'))renderLiveTxnFeed();},4000);
+}
+
+// TOAST
+let toastTimer;
+function toast(icon,text,sub){document.getElementById('toastIcon').textContent=icon;document.getElementById('toastText').textContent=text;document.getElementById('toastSub').textContent=sub||'';const el=document.getElementById('toastEl');el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3000);}
+
+// CLOCK
+setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-IN',{hour12:false});},1000);
+
+// LOGIN
+let role='super';
+function setRole(el,r){document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');role=r;}
+function doLogin(){const btn=document.getElementById('loginBtn');btn.innerHTML='<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:8px;vertical-align:middle;"></span>Authenticating…';btn.disabled=true;setTimeout(()=>{document.getElementById('loginScreen').style.opacity='0';document.getElementById('loginScreen').style.transition='opacity 0.4s';setTimeout(()=>{document.getElementById('loginScreen').style.display='none';document.getElementById('adminApp').style.display='block';initAll();},400);},1600);}
+function logout(){document.getElementById('adminApp').style.display='none';document.getElementById('loginScreen').style.display='flex';document.getElementById('loginScreen').style.opacity='1';document.getElementById('loginBtn').innerHTML='Sign In to Master Panel';document.getElementById('loginBtn').disabled=false;}
+
+// INIT
+function initAll(){
+  try { loadSavedSettings(); } catch(e){ console.warn('settings load err',e); }
+  try { renderVendors(vendors); } catch(e){ console.warn(e); }
+  try { renderOrders(); } catch(e){ console.warn(e); }
+  try { renderInventoryVendors(); } catch(e){ console.warn(e); }
+  try { renderInvItems(); } catch(e){ console.warn(e); }
+  try { renderAlerts('overviewAlerts',alerts.slice(0,3)); renderAlerts('fullAlerts',alerts); } catch(e){ console.warn(e); }
+  try { renderTopVendors(); } catch(e){ console.warn(e); }
+  try { renderHealthPanel(); } catch(e){ console.warn(e); }
+  try { renderPayouts(); } catch(e){ console.warn(e); }
+  try { renderLedger(); } catch(e){ console.warn(e); }
+  try { renderCustomers(); } catch(e){ console.warn(e); }
+  try { renderRiders(); } catch(e){ console.warn(e); }
+  try { renderAdmins(); } catch(e){ console.warn(e); }
+  try { renderFeatureToggles(); } catch(e){ console.warn(e); }
+  try { renderPaymentToggles(); } catch(e){ console.warn(e); }
+  try { renderRiderPayCards(); } catch(e){ console.warn(e); }
+  try { renderPayHistory(); } catch(e){ console.warn(e); }
+  try { renderGwCards(); } catch(e){ console.warn(e); }
+  try { renderTxnMethods(); } catch(e){ console.warn(e); }
+  try { renderLiveTxnFeed(); } catch(e){ console.warn(e); }
+  try { renderFailedTxns(); } catch(e){ console.warn(e); }
+  setTimeout(()=>{ try{ initCharts(); }catch(e){ console.warn('chart err',e); } },200);
+  setInterval(()=>{
+    try{
+      const el=document.getElementById('kpi-orders');
+      if(el){const n=parseInt(el.textContent.replace(/,/g,''))+Math.floor(Math.random()*4+1);el.textContent=n.toLocaleString('en-IN');}
+    }catch(e){}
+  },4000);
+}
+const ks=document.createElement('style');
+ks.textContent='@keyframes spin{to{transform:rotate(360deg);}}';
+document.head.appendChild(ks);
+</script>
+</body>
+</html>
