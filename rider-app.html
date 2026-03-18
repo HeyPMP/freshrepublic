@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Fresh Republic — Rider App</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f0f13;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:30px 20px;gap:40px;flex-wrap:wrap;}
+.info-panel{max-width:300px;color:#fff;}
+.info-logo{font-size:32px;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px;}
+.info-logo span{color:#00e676;}
+.info-sub{font-size:12px;color:#555;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:32px;}
+.info-feature{display:flex;align-items:flex-start;gap:12px;margin-bottom:20px;}
+.if-icon{width:36px;height:36px;border-radius:10px;background:#1a1a20;border:1px solid #2a2a35;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.if-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.if-sub{font-size:11px;color:#555;line-height:1.5;}
+.rider-stats{margin-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.rs-card{background:#141418;border:1px solid #222;border-radius:12px;padding:14px;}
+.rs-val{font-size:22px;font-weight:800;color:#00e676;}
+.rs-label{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;}
+.portal-links{margin-top:32px;display:flex;flex-direction:column;gap:8px;}
+.pl-link{display:flex;align-items:center;gap:10px;background:#141418;border:1px solid #222;border-radius:10px;padding:10px 14px;text-decoration:none;color:#888;font-size:12px;font-weight:600;transition:all 0.15s;}
+.pl-link:hover{border-color:#3a3a45;color:#fff;}
+.phone-frame{width:375px;height:812px;background:#0a0a0e;border-radius:54px;border:2px solid #2a2a35;overflow:hidden;position:relative;box-shadow:0 40px 80px rgba(0,0,0,0.6),0 0 0 1px #1a1a22,inset 0 0 0 1px #0d0d12;}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#0a0a0e;border-radius:0 0 20px 20px;z-index:100;display:flex;align-items:center;justify-content:center;}
+.notch-cam{width:10px;height:10px;border-radius:50%;background:#1a1a20;border:1px solid #2a2a35;}
+.status-bar{position:absolute;top:0;left:0;right:0;height:44px;display:flex;align-items:center;justify-content:space-between;padding:10px 24px 0;z-index:99;font-size:11px;font-weight:600;color:#fff;}
+.sb-time{font-family:'Space Mono',monospace;font-size:12px;}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;background:#0a0a0e;overflow:hidden;}
+.screen.active{display:flex;}
+/* LOGIN */
+#scrLogin{background:linear-gradient(160deg,#0d1a0d 0%,#0a0a0e 60%);justify-content:flex-end;padding-bottom:48px;}
+.login-map-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(0,230,118,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,230,118,0.04) 1px,transparent 1px);background-size:32px 32px;}
+.login-glow{position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,230,118,0.12) 0%,transparent 70%);}
+.login-bike{position:absolute;top:18%;left:50%;transform:translateX(-50%);font-size:80px;animation:floatBike 3s ease-in-out infinite;}
+@keyframes floatBike{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-10px);}}
+.login-ring{position:absolute;top:18%;left:50%;transform:translate(-50%,-50%);width:160px;height:160px;border-radius:50%;border:1px solid rgba(0,230,118,0.2);animation:ripple 2.5s ease-out infinite;}
+.login-ring2{position:absolute;top:18%;left:50%;transform:translate(-50%,-50%);width:220px;height:220px;border-radius:50%;border:1px solid rgba(0,230,118,0.1);animation:ripple 2.5s ease-out infinite 0.8s;}
+@keyframes ripple{0%{transform:translate(-50%,-50%) scale(0.8);opacity:1;}100%{transform:translate(-50%,-50%) scale(1.2);opacity:0;}}
+.login-card{position:relative;z-index:2;background:rgba(20,20,28,0.95);border:1px solid #1e1e2a;border-radius:28px;margin:0 20px;padding:28px 24px;}
+.lc-title{font-size:26px;font-weight:800;margin-bottom:4px;}
+.lc-title span{color:#00e676;}
+.lc-sub{font-size:12px;color:#444;margin-bottom:24px;}
+.inp{width:100%;background:#111118;border:1px solid #1e1e2a;border-radius:14px;padding:14px 16px;font-size:14px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;outline:none;margin-bottom:12px;transition:border-color 0.2s;}
+.inp:focus{border-color:#00e676;}
+.inp::placeholder{color:#333;}
+.btn-green{width:100%;background:#00e676;color:#000;border:none;border-radius:14px;padding:16px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all 0.2s;margin-top:4px;}
+.btn-green:hover{background:#1aff8a;}
+.demo-hint{text-align:center;font-size:11px;color:#333;margin-top:12px;}
+.demo-hint span{color:#555;}
+/* HOME */
+#scrHome{background:#0a0a0e;}
+.home-header{padding:52px 20px 20px;background:linear-gradient(180deg,#0d1a0d,#0a0a0e);}
+.hh-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.hh-greeting{font-size:13px;color:#555;}
+.hh-name{font-size:20px;font-weight:800;}
+.hh-avatar{width:42px;height:42px;border-radius:13px;background:#00e676;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#000;}
+.online-toggle{display:flex;align-items:center;justify-content:space-between;background:#111118;border:1px solid #1e1e2a;border-radius:18px;padding:14px 18px;margin:0 20px 20px;cursor:pointer;}
+.ot-left{display:flex;align-items:center;gap:12px;}
+.ot-dot{width:10px;height:10px;border-radius:50%;transition:all 0.3s;}
+.ot-dot.on{background:#00e676;box-shadow:0 0 8px #00e676;}
+.ot-dot.off{background:#333;}
+.ot-label{font-size:14px;font-weight:700;}
+.ot-sub{font-size:11px;color:#444;}
+.ot-switch{width:48px;height:26px;border-radius:100px;background:#1e1e2a;position:relative;transition:background 0.3s;}
+.ot-switch.on{background:#00e676;}
+.ot-thumb{position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left 0.3s;}
+.ot-switch.on .ot-thumb{left:25px;}
+.today-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 20px 16px;}
+.ts-card{background:#111118;border:1px solid #1a1a22;border-radius:16px;padding:14px 12px;}
+.ts-val{font-size:20px;font-weight:800;margin-bottom:2px;}
+.ts-label{font-size:9px;color:#444;text-transform:uppercase;letter-spacing:0.08em;}
+.section-title{font-size:13px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.1em;padding:0 20px;margin-bottom:12px;}
+.new-order-card{margin:0 20px 16px;background:#111f14;border:1px solid rgba(0,230,118,0.25);border-radius:20px;padding:18px;position:relative;overflow:hidden;animation:newOrderPulse 2s ease-in-out infinite;}
+@keyframes newOrderPulse{0%,100%{border-color:rgba(0,230,118,0.25);}50%{border-color:rgba(0,230,118,0.6);}}
+.noc-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,230,118,0.15);color:#00e676;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:4px 10px;border-radius:100px;margin-bottom:12px;}
+.noc-pulse{width:6px;height:6px;border-radius:50%;background:#00e676;animation:dot 1s step-end infinite;}
+@keyframes dot{0%,100%{opacity:1;}50%{opacity:0.2;}}
+.noc-route{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.noc-store{font-size:14px;font-weight:700;}
+.noc-arrow{font-size:18px;color:#00e676;}
+.noc-meta{display:flex;gap:16px;margin-bottom:16px;}
+.noc-m{display:flex;align-items:center;gap:5px;font-size:12px;color:#666;}
+.noc-m strong{color:#ccc;}
+.noc-actions{display:flex;gap:10px;}
+.btn-accept{flex:2;background:#00e676;color:#000;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all 0.15s;}
+.btn-accept:active{transform:scale(0.97);}
+.btn-decline{flex:1;background:#1a1a22;color:#555;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;}
+.active-order-card{margin:0 20px 16px;background:#111118;border:1px solid #1e1e2a;border-radius:20px;padding:18px;display:none;}
+.trip-item{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #111118;}
+.trip-icon{width:40px;height:40px;border-radius:12px;background:#111118;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.trip-route{font-size:13px;font-weight:600;margin-bottom:2px;}
+.trip-time{font-size:11px;color:#444;}
+.trip-amount{font-size:14px;font-weight:800;color:#00e676;}
+/* MAP SCREEN */
+#scrMap{background:#0a0a0e;}
+.map-header{padding:52px 20px 14px;display:flex;align-items:center;justify-content:space-between;}
+.map-back{width:36px;height:36px;border-radius:11px;background:#111118;border:1px solid #1e1e2a;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;}
+.map-eta-chip{background:rgba(0,230,118,0.15);color:#00e676;font-size:12px;font-weight:700;padding:4px 12px;border-radius:100px;display:inline-block;margin-bottom:4px;}
+.map-dest{font-size:15px;font-weight:700;}
+.map-addr{font-size:11px;color:#444;}
+.map-view{flex:1;position:relative;overflow:hidden;background:#0d120d;margin:0 12px;border-radius:24px;}
+.map-grid-layer{position:absolute;inset:0;background-image:linear-gradient(rgba(0,230,118,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,230,118,0.03) 1px,transparent 1px);background-size:28px 28px;}
+.road{position:absolute;background:rgba(255,255,255,0.07);border-radius:3px;}
+.road-h{left:0;right:0;height:5px;}
+.road-h.main{height:9px;background:rgba(255,255,255,0.1);}
+.road-v{top:0;bottom:0;width:5px;}
+.road-v.main{width:9px;background:rgba(255,255,255,0.1);}
+.route-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+.map-pin{position:absolute;display:flex;flex-direction:column;align-items:center;cursor:pointer;z-index:10;}
+.pin-bubble{padding:6px 10px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;margin-bottom:3px;}
+.pin-store-b{background:#1a3a4a;color:#00d4ff;border:1px solid rgba(0,212,255,0.3);}
+.pin-home-b{background:#1a3a2a;color:#00e676;border:1px solid rgba(0,230,118,0.3);}
+.pin-tail{width:2px;height:8px;background:rgba(255,255,255,0.3);border-radius:1px;}
+.rider-dot{position:absolute;z-index:20;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:18px;animation:rideRoute 8s linear infinite;}
+.rider-dot::before{content:'';position:absolute;width:48px;height:48px;border-radius:50%;background:rgba(0,230,118,0.15);animation:riderPulse 2s ease-out infinite;}
+@keyframes riderPulse{0%{transform:scale(0.6);opacity:1;}100%{transform:scale(1.4);opacity:0;}}
+@keyframes rideRoute{0%{left:42%;top:60%;}20%{left:46%;top:50%;}40%{left:52%;top:40%;}60%{left:58%;top:32%;}80%{left:62%;top:26%;}100%{left:42%;top:60%;}}
+.map-bottom{background:#111118;border-radius:28px 28px 0 0;border-top:1px solid #1e1e2a;padding:20px 20px 32px;}
+.mb-handle{width:36px;height:4px;background:#222;border-radius:100px;margin:0 auto 16px;}
+.mb-step{display:flex;align-items:center;gap:12px;padding:12px;background:#161620;border-radius:14px;margin-bottom:10px;border:1px solid transparent;transition:all 0.2s;}
+.mb-step.done{border-color:rgba(0,230,118,0.2);background:#0f1a12;}
+.mb-step.active-step{border-color:rgba(0,230,118,0.4);background:#111f14;}
+.mb-step-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.si-done{background:#0d1f10;}.si-active{background:#0d1f10;animation:iconPulse 1.5s ease-in-out infinite;}.si-pending{background:#141420;}
+@keyframes iconPulse{0%,100%{background:#0d1f10;}50%{background:#122a16;}}
+.mb-step-title{font-size:13px;font-weight:700;margin-bottom:1px;}
+.mb-step-sub{font-size:11px;color:#444;}
+.mb-step-check{font-size:16px;color:#00e676;}
+.mb-step-pending{width:18px;height:18px;border-radius:50%;border:2px solid #222;}
+.btn-next-step{width:100%;background:#00e676;color:#000;border:none;border-radius:14px;padding:16px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all 0.2s;margin-top:4px;}
+.btn-next-step:active{transform:scale(0.98);}
+.speed-chip{position:absolute;top:16px;right:16px;z-index:15;background:rgba(17,17,24,0.9);border:1px solid #1e1e2a;border-radius:12px;padding:8px 12px;text-align:center;}
+.speed-val{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:#00e676;line-height:1;}
+.speed-unit{font-size:9px;color:#444;text-transform:uppercase;letter-spacing:0.08em;}
+.locate-btn{position:absolute;bottom:16px;right:16px;z-index:15;width:40px;height:40px;border-radius:13px;background:rgba(17,17,24,0.95);border:1px solid #1e1e2a;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:all 0.2s;}
+.locate-btn:hover{border-color:#00e676;background:#0d1a0d;}
+/* EARNINGS */
+#scrEarnings{background:#0a0a0e;overflow-y:auto;}
+.earn-header{padding:52px 20px 20px;}
+.earn-card{margin:0 20px 20px;background:linear-gradient(135deg,#0d1f10,#111a14);border:1px solid rgba(0,230,118,0.2);border-radius:24px;padding:24px;}
+.ec-label{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;}
+.ec-amount{font-size:42px;font-weight:800;color:#00e676;line-height:1;margin-bottom:4px;}
+.ec-sub{font-size:12px;color:#444;}
+.ec-breakdown{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:16px;}
+.ecb{background:rgba(0,0,0,0.3);border-radius:12px;padding:12px;text-align:center;}
+.ecb-val{font-size:18px;font-weight:800;}
+.ecb-label{font-size:9px;color:#444;text-transform:uppercase;letter-spacing:0.06em;margin-top:2px;}
+.wc-bars{display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:8px;}
+.wc-bar{flex:1;border-radius:6px 6px 0 0;background:#1a1a22;position:relative;transition:height 0.5s;cursor:pointer;}
+.wc-bar.today{background:linear-gradient(180deg,#00e676,#00b85a);}
+.wc-label{flex:1;text-align:center;font-size:9px;color:#333;text-transform:uppercase;}
+.wc-label.today-l{color:#00e676;}
+/* PROFILE */
+#scrProfile{background:#0a0a0e;overflow-y:auto;}
+.profile-header{padding:52px 20px 0;text-align:center;background:linear-gradient(180deg,#0d1a0d,#0a0a0e);padding-bottom:28px;}
+.profile-ava{width:80px;height:80px;border-radius:24px;background:#00e676;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:800;color:#000;margin:0 auto 12px;box-shadow:0 0 0 3px rgba(0,230,118,0.3);}
+.profile-name{font-size:22px;font-weight:800;margin-bottom:4px;}
+.profile-id{font-family:'Space Mono',monospace;font-size:11px;color:#333;}
+.profile-stats{display:flex;justify-content:center;gap:32px;margin-top:20px;}
+.ps-item{text-align:center;}
+.ps-val{font-size:20px;font-weight:800;}
+.ps-label{font-size:10px;color:#444;margin-top:2px;}
+.star-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.sb-star{font-size:11px;color:#555;width:16px;}
+.sb-bar{flex:1;height:6px;background:#1a1a22;border-radius:100px;overflow:hidden;}
+.sb-fill{height:100%;border-radius:100px;background:#00e676;}
+.sb-count{font-size:10px;color:#444;width:20px;text-align:right;}
+.menu-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#111118;border:1px solid #1a1a22;border-radius:14px;margin-bottom:8px;cursor:pointer;transition:all 0.15s;}
+.menu-item:hover{border-color:#2a2a35;}
+.mi-icon{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.mi-title{font-size:13px;font-weight:600;flex:1;}
+.mi-arrow{color:#333;font-size:16px;}
+/* ORDER ACCEPTED OVERLAY */
+.order-overlay{position:absolute;inset:0;background:rgba(10,10,14,0.95);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;}
+.order-overlay.show{display:flex;}
+.oo-check{font-size:72px;margin-bottom:20px;animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes popIn{0%{transform:scale(0);}100%{transform:scale(1);}}
+.oo-title{font-size:28px;font-weight:800;margin-bottom:8px;text-align:center;}
+.oo-sub{font-size:14px;color:#555;text-align:center;margin-bottom:32px;line-height:1.6;}
+.oo-details{width:100%;background:#111118;border:1px solid #1e1e2a;border-radius:20px;padding:18px;margin-bottom:24px;}
+.oo-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #141420;}
+.oo-row:last-child{border-bottom:none;}
+.oo-key{font-size:12px;color:#444;}
+.oo-val{font-size:13px;font-weight:700;}
+.btn-navigate{width:100%;background:#00e676;color:#000;border:none;border-radius:14px;padding:16px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;}
+/* BOTTOM NAV */
+.bottom-nav{position:absolute;bottom:0;left:0;right:0;background:#111118;border-top:1px solid #1a1a22;display:flex;padding:10px 0 28px;z-index:90;}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all 0.15s;padding:4px 0;}
+.bn-icon{font-size:20px;transition:transform 0.2s;}
+.bn-label{font-size:9px;font-weight:600;color:#333;text-transform:uppercase;letter-spacing:0.06em;transition:color 0.2s;}
+.bn-item.active .bn-label{color:#00e676;}
+.bn-item.active .bn-icon{transform:scale(1.15);}
+.bn-dot{width:4px;height:4px;border-radius:50%;background:#00e676;margin:-2px auto 0;opacity:0;}
+.bn-item.active .bn-dot{opacity:1;}
+/* APP TOAST */
+#appToast{position:absolute;bottom:90px;left:16px;right:16px;z-index:300;background:rgba(17,17,24,0.96);border:1px solid #2a2a35;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;transform:translateY(60px);opacity:0;transition:all 0.3s;pointer-events:none;}
+#appToast.show{transform:translateY(0);opacity:1;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+<script src="fr-settings.js"></script>
+</head>
+<body>
+<div class="info-panel">
+  <div class="info-logo"><img src="fr-logo-text.png" alt="Fresh Republic" style="height:40px;object-fit:contain;filter:invert(1);"></div>
+  <div class="info-sub">Rider App · v2.4.1</div>
+  <div class="info-feature"><div class="if-icon">📍</div><div><div class="if-title">Live GPS Tracking</div><div class="if-sub">Real-time location broadcast with turn-by-turn routing.</div></div></div>
+  <div class="info-feature"><div class="if-icon">⚡</div><div><div class="if-title">Instant Order Alerts</div><div class="if-sub">New orders ping with 30-second accept/decline window.</div></div></div>
+  <div class="info-feature"><div class="if-icon">💰</div><div><div class="if-title">Live Earnings Dashboard</div><div class="if-sub">Real-time earnings, trip history and payout schedule.</div></div></div>
+  <div class="info-feature"><div class="if-icon">🗺️</div><div><div class="if-title">Smart Route Engine</div><div class="if-sub">Optimal route from store to customer with traffic avoidance.</div></div></div>
+  <div class="rider-stats">
+    <div class="rs-card"><div class="rs-val">14.2</div><div class="rs-label">Avg Trips/Day</div></div>
+    <div class="rs-card"><div class="rs-val">47m</div><div class="rs-label">Avg Delivery</div></div>
+    <div class="rs-card"><div class="rs-val">₹980</div><div class="rs-label">Avg Daily Earn</div></div>
+    <div class="rs-card"><div class="rs-val">4.8★</div><div class="rs-label">Avg Rating</div></div>
+  </div>
+  <div class="portal-links">
+    <a class="pl-link" href="index.html">🏠 Portal Hub</a>
+    <a class="pl-link" href="vendor-dashboard.html">🏪 Vendor Dashboard</a>
+    <a class="pl-link" href="admin-panel.html">⚙️ Admin Panel</a>
+  </div>
+</div>
+<div>
+<div class="phone-frame">
+  <div class="notch"><div class="notch-cam"></div></div>
+  <div class="status-bar"><div class="sb-time" id="clock">9:41</div><div style="display:flex;gap:6px;align-items:center;font-size:11px;"><span>●●●●</span><span>WiFi</span><span>🔋</span></div></div>
+  <!-- LOGIN -->
+  <div class="screen active" id="scrLogin">
+    <div class="login-map-bg"></div><div class="login-glow"></div>
+    <div class="login-ring"></div><div class="login-ring2"></div>
+    <div class="login-bike">🏍️</div>
+    <div class="login-card">
+      <div class="lc-title"><img src="fr-logo-circle.png" alt="FR" style="width:48px;height:48px;border-radius:50%;display:block;margin:0 auto 8px;"><img src="fr-logo-text.png" alt="Fresh Republic" style="height:28px;object-fit:contain;filter:invert(1);display:block;margin:0 auto;"></div>
+      <div class="lc-sub">Sign in to start earning</div>
+      <input class="inp" type="tel" placeholder="Mobile Number" value="9876543210"/>
+      <input class="inp" type="password" placeholder="Password" value="rider123"/>
+      <button class="btn-green" id="loginBtn" onclick="doLogin()">Get On The Road 🚀</button>
+      <div class="demo-hint">Demo: <span>9876543210</span> / <span>rider123</span></div>
+    </div>
+  </div>
+  <!-- HOME -->
+  <div class="screen" id="scrHome" style="overflow-y:auto;padding-bottom:80px;">
+    <div class="home-header">
+      <div class="hh-top">
+        <div><div class="hh-greeting">Good evening,</div><div class="hh-name">Amit Kumar 👋</div></div>
+        <div class="hh-avatar">AK</div>
+      </div>
+    </div>
+    <div class="online-toggle" onclick="toggleOnline()">
+      <div class="ot-left"><div class="ot-dot on" id="onlineDot"></div><div><div class="ot-label" id="onlineLabel">You're Online</div><div class="ot-sub" id="onlineSub">Receiving new orders</div></div></div>
+      <div class="ot-switch on" id="onlineSwitch"><div class="ot-thumb"></div></div>
+    </div>
+    <div class="today-stats">
+      <div class="ts-card"><div class="ts-val" style="color:#00e676;" id="todayEarnings">₹840</div><div class="ts-label">Earned Today</div></div>
+      <div class="ts-card"><div class="ts-val" id="todayTrips">12</div><div class="ts-label">Trips Done</div></div>
+      <div class="ts-card"><div class="ts-val" style="color:#00d4ff;">4.9★</div><div class="ts-label">Rating</div></div>
+    </div>
+    <div class="section-title">New Order</div>
+    <div class="new-order-card" id="newOrderCard">
+      <div class="noc-badge"><span class="noc-pulse"></span>New Order · <span id="cdSec">28</span> sec left</div>
+      <div class="noc-route"><div><div style="font-size:10px;color:#555;margin-bottom:2px;">PICKUP</div><div class="noc-store">🏪 Zara India</div></div><div class="noc-arrow">→</div><div><div style="font-size:10px;color:#555;margin-bottom:2px;">DROP</div><div class="noc-store">🏠 Priya Sharma</div></div></div>
+      <div class="noc-meta"><div class="noc-m">📍 <strong>3.2 km</strong></div><div class="noc-m">⏱ <strong>~28 min</strong></div><div class="noc-m">💰 <strong>₹68</strong></div></div>
+      <div class="noc-actions"><button class="btn-accept" onclick="acceptOrder()">✓ Accept Order</button><button class="btn-decline" onclick="declineOrder()">Decline</button></div>
+      <div style="margin-top:12px;background:#1a1a22;border-radius:100px;height:3px;overflow:hidden;"><div id="countdownBar" style="height:100%;background:#00e676;border-radius:100px;width:100%;transition:width 0.1s linear;"></div></div>
+    </div>
+    <div class="active-order-card" id="activeOrderCard">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><span style="font-size:13px;font-weight:700;">Active Order</span><span class="noc-badge" style="animation:none;"><span class="noc-pulse"></span>In Progress</span></div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px;">🏪 Zara India → 🏠 Priya Sharma</div>
+      <div style="font-size:11px;color:#444;margin-bottom:14px;">FF-9001 · Floral Wrap Dress (M) · ₹2,499</div>
+      <button class="btn-green" onclick="openMapScreen()" style="font-size:13px;padding:12px;">📍 Open Navigation</button>
+    </div>
+    <div class="section-title" style="margin-top:8px;">Recent Trips</div>
+    <div style="padding:0 20px;">
+      <div class="trip-item"><div class="trip-icon">🏪</div><div class="trip-info" style="flex:1"><div class="trip-route">Nike India → Rahul M.</div><div class="trip-time">42 min · 4.1 km</div></div><div class="trip-amount">₹82</div></div>
+      <div class="trip-item"><div class="trip-icon">🧵</div><div class="trip-info" style="flex:1"><div class="trip-route">FabIndia → Sneha K.</div><div class="trip-time">38 min · 3.6 km</div></div><div class="trip-amount">₹74</div></div>
+      <div class="trip-item"><div class="trip-icon">👜</div><div class="trip-info" style="flex:1"><div class="trip-route">Hidesign → Arjun N.</div><div class="trip-time">51 min · 5.2 km</div></div><div class="trip-amount">₹96</div></div>
+    </div>
+  </div>
+  <!-- MAP -->
+  <div class="screen" id="scrMap">
+    <div class="map-header">
+      <div class="map-back" onclick="goScreen('scrHome')">←</div>
+      <div><div class="map-eta-chip" id="etaChip">ETA 28 min</div><div class="map-dest">Priya Sharma's Home</div><div class="map-addr">14B, Burnpur Road, Asansol</div></div>
+      <div style="font-size:22px;">🔔</div>
+    </div>
+    <div class="map-view">
+      <div class="map-grid-layer"></div>
+      <div class="road road-h main" style="top:30%"></div><div class="road road-h" style="top:45%"></div><div class="road road-h" style="top:60%"></div>
+      <div class="road road-v main" style="left:35%"></div><div class="road road-v" style="left:55%"></div><div class="road road-v" style="left:70%"></div>
+      <svg class="route-svg" viewBox="0 0 375 340" preserveAspectRatio="none">
+        <defs><linearGradient id="rg" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#00e676;stop-opacity:0.8"/><stop offset="100%" style="stop-color:#00d4ff;stop-opacity:0.8"/></linearGradient></defs>
+        <path d="M165,221 L165,165 L207,165 L207,103 L237,103 L237,74" stroke="url(#rg)" stroke-width="4" fill="none" stroke-dasharray="8,4" stroke-linecap="round"/>
+        <path d="M165,221 L165,165 L207,165 L207,103 L237,103 L237,74" stroke="rgba(0,230,118,0.15)" stroke-width="12" fill="none" stroke-linecap="round"/>
+      </svg>
+      <div class="map-pin" style="left:38%;top:58%;"><div class="pin-bubble pin-store-b">🏪 Zara India</div><div class="pin-tail"></div></div>
+      <div class="map-pin" style="left:56%;top:12%;"><div class="pin-bubble pin-home-b">🏠 Priya S.</div><div class="pin-tail"></div></div>
+      <div class="rider-dot">🏍️</div>
+      <div class="speed-chip"><div class="speed-val" id="speedVal">24</div><div class="speed-unit">km/h</div></div>
+      <div class="locate-btn" onclick="appToast('📍','Location Updated','Broadcasting to platform')">📍</div>
+    </div>
+    <div class="map-bottom">
+      <div class="mb-handle"></div>
+      <div class="mb-step done" id="step1"><div class="mb-step-icon si-done">✅</div><div><div class="mb-step-title">Order Picked Up</div><div class="mb-step-sub">Zara India · FF-9001</div></div><div class="mb-step-check">✓</div></div>
+      <div class="mb-step active-step" id="step2"><div class="mb-step-icon si-active">🏍️</div><div><div class="mb-step-title">On the Way</div><div class="mb-step-sub" id="enRouteLabel">2.1 km remaining · 18 min</div></div><div class="mb-step-check" style="color:#00e676;">●</div></div>
+      <div class="mb-step" id="step3"><div class="mb-step-icon si-pending">📦</div><div><div class="mb-step-title">Deliver to Customer</div><div class="mb-step-sub">14B Burnpur Road</div></div><div class="mb-step-pending"></div></div>
+      <button class="btn-next-step" id="deliverBtn" onclick="markDelivered()">Mark as Delivered</button>
+    </div>
+  </div>
+  <!-- EARNINGS -->
+  <div class="screen" id="scrEarnings">
+    <div class="earn-header"><div style="font-size:20px;font-weight:800;margin-top:8px;">My Earnings</div><div style="font-size:12px;color:#444;margin-top:2px;">Wednesday, March 18</div></div>
+    <div class="earn-card">
+      <div class="ec-label">Today's Total</div>
+      <div class="ec-amount" id="totalEarnings">₹840</div>
+      <div class="ec-sub">Next payout: Friday · ₹5,240 pending</div>
+      <div class="ec-breakdown">
+        <div class="ecb"><div class="ecb-val">12</div><div class="ecb-label">Trips</div></div>
+        <div class="ecb"><div class="ecb-val" style="color:#00d4ff;">₹70</div><div class="ecb-label">Avg/Trip</div></div>
+        <div class="ecb"><div class="ecb-val" style="color:#ffb830;">4.9★</div><div class="ecb-label">Rating</div></div>
+      </div>
+    </div>
+    <div style="margin:0 20px 20px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:14px;">This Week</div>
+      <div class="wc-bars" id="weekBars"></div>
+      <div style="display:flex;gap:6px;"><div class="wc-label">Mon</div><div class="wc-label">Tue</div><div class="wc-label today-l">Wed ✦</div><div class="wc-label">Thu</div><div class="wc-label">Fri</div><div class="wc-label">Sat</div><div class="wc-label">Sun</div></div>
+    </div>
+    <div style="margin:0 20px 16px;background:#1a1400;border:1px solid rgba(255,184,48,0.25);border-radius:18px;padding:16px;display:flex;align-items:center;gap:12px;"><div style="font-size:28px;">🏆</div><div><div style="font-size:13px;font-weight:700;color:#ffb830;">Peak Hour Bonus Active</div><div style="font-size:11px;color:#5a4a00;margin-top:2px;">+₹20 per trip · 6 PM – 9 PM</div></div></div>
+    <div style="padding:0 20px;margin-bottom:80px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:12px;">Today's Trips</div>
+      <div class="trip-item"><div class="trip-icon">👗</div><div style="flex:1"><div class="trip-route">Zara India → Priya S.</div><div class="trip-time">2:41 PM · 38 min</div></div><div class="trip-amount">₹82</div></div>
+      <div class="trip-item"><div class="trip-icon">👟</div><div style="flex:1"><div class="trip-route">Nike India → Rahul M.</div><div class="trip-time">1:18 PM · 44 min</div></div><div class="trip-amount">₹96</div></div>
+      <div class="trip-item"><div class="trip-icon">🧥</div><div style="flex:1"><div class="trip-route">H&M India → Sneha K.</div><div class="trip-time">12:02 PM · 31 min</div></div><div class="trip-amount">₹64</div></div>
+    </div>
+  </div>
+  <!-- PROFILE -->
+  <div class="screen" id="scrProfile">
+    <div class="profile-header">
+      <div class="profile-ava">AK</div>
+      <div class="profile-name">Amit Kumar</div>
+      <div class="profile-id">RIDER · FF-R-00142 · Asansol</div>
+      <div class="profile-stats">
+        <div class="ps-item"><div class="ps-val" style="color:#00e676;">28</div><div class="ps-label">Today</div></div>
+        <div class="ps-item"><div class="ps-val">1,840</div><div class="ps-label">Total Trips</div></div>
+        <div class="ps-item"><div class="ps-val" style="color:#ffb830;">4.9★</div><div class="ps-label">Rating</div></div>
+      </div>
+    </div>
+    <div style="margin:20px;background:#111118;border:1px solid #1e1e2a;border-radius:20px;padding:18px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:14px;">Customer Ratings</div>
+      <div style="font-size:36px;font-weight:800;color:#00e676;margin-bottom:8px;">4.9</div>
+      <div style="font-size:11px;color:#444;margin-bottom:14px;">Based on 1,840 deliveries</div>
+      <div class="star-bar"><div class="sb-star">5★</div><div class="sb-bar"><div class="sb-fill" style="width:88%"></div></div><div class="sb-count" style="color:#00e676;">88%</div></div>
+      <div class="star-bar"><div class="sb-star">4★</div><div class="sb-bar"><div class="sb-fill" style="width:9%;background:#ffb830;"></div></div><div class="sb-count">9%</div></div>
+      <div class="star-bar"><div class="sb-star">3★</div><div class="sb-bar"><div class="sb-fill" style="width:2%;background:#ff9d00;"></div></div><div class="sb-count">2%</div></div>
+      <div class="star-bar"><div class="sb-star">2★</div><div class="sb-bar"><div class="sb-fill" style="width:1%;background:#ff4d6a;"></div></div><div class="sb-count">1%</div></div>
+    </div>
+    <div style="padding:0 20px;margin-bottom:8px;"><div style="font-size:13px;font-weight:700;margin-bottom:12px;">Achievements</div><div style="display:flex;gap:8px;flex-wrap:wrap;"><div style="background:#111118;border:1px solid #1e1e2a;border-radius:12px;padding:8px 12px;font-size:11px;display:flex;align-items:center;gap:6px;">🏆 Top Rider</div><div style="background:#111118;border:1px solid #1e1e2a;border-radius:12px;padding:8px 12px;font-size:11px;">⚡ Speed Demon</div><div style="background:#111118;border:1px solid #1e1e2a;border-radius:12px;padding:8px 12px;font-size:11px;">💯 100% On-Time</div><div style="background:#111118;border:1px solid #1e1e2a;border-radius:12px;padding:8px 12px;font-size:11px;">🌟 1000 Trips</div></div></div>
+    <div style="padding:0 20px;margin-bottom:32px;">
+      <div class="menu-item" onclick="appToast('📄','Documents verified','All KYC docs are valid')"><div class="mi-icon" style="background:#111f14;">📄</div><div class="mi-title">My Documents</div><div class="mi-arrow">›</div></div>
+      <div class="menu-item" onclick="appToast('🏦','Bank details','HDFC •••• 4291')"><div class="mi-icon" style="background:#0d1a2e;">🏦</div><div class="mi-title">Bank Account</div><div class="mi-arrow">›</div></div>
+      <div class="menu-item" onclick="appToast('🛵','Vehicle','Honda Activa · WB-02-AB-4821')"><div class="mi-icon" style="background:#1a1a0d;">🛵</div><div class="mi-title">My Vehicle</div><div class="mi-arrow">›</div></div>
+      <div class="menu-item" onclick="appToast('📞','Support','Connecting to rider support...')"><div class="mi-icon" style="background:#1a0d1a;">📞</div><div class="mi-title">Support</div><div class="mi-arrow">›</div></div>
+      <div class="menu-item" style="border-color:rgba(255,77,106,0.2);" onclick="doLogout()"><div class="mi-icon" style="background:#1f1218;">🚪</div><div class="mi-title" style="color:#ff4d6a;">Sign Out</div><div class="mi-arrow" style="color:#ff4d6a;">›</div></div>
+    </div>
+  </div>
+  <!-- ORDER ACCEPTED OVERLAY -->
+  <div class="order-overlay" id="orderOverlay">
+    <div class="oo-check">✅</div>
+    <div class="oo-title">Order Accepted!</div>
+    <div class="oo-sub">Head to Zara India for pickup.<br/>Customer has been notified.</div>
+    <div class="oo-details">
+      <div class="oo-row"><div class="oo-key">Order ID</div><div class="oo-val" style="font-family:'Space Mono',monospace;font-size:12px;">FF-9001</div></div>
+      <div class="oo-row"><div class="oo-key">Item</div><div class="oo-val">Floral Wrap Dress (M)</div></div>
+      <div class="oo-row"><div class="oo-key">Pickup</div><div class="oo-val">🏪 Zara India, Asansol</div></div>
+      <div class="oo-row"><div class="oo-key">Drop</div><div class="oo-val">🏠 14B Burnpur Road</div></div>
+      <div class="oo-row"><div class="oo-key">Your Earnings</div><div class="oo-val" style="color:#00e676;">₹68 + tip</div></div>
+    </div>
+    <button class="btn-navigate" onclick="startNavigation()">🗺️ Start Navigation</button>
+  </div>
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav" id="bottomNav" style="display:none;">
+    <div class="bn-item active" onclick="goScreen('scrHome');setNav(this)"><div class="bn-icon">🏠</div><div class="bn-label">Home</div><div class="bn-dot"></div></div>
+    <div class="bn-item" onclick="openMapScreen();setNav(this)"><div class="bn-icon">🗺️</div><div class="bn-label">Navigate</div><div class="bn-dot"></div></div>
+    <div class="bn-item" onclick="goScreen('scrEarnings');setNav(this)"><div class="bn-icon">💰</div><div class="bn-label">Earnings</div><div class="bn-dot"></div></div>
+    <div class="bn-item" onclick="goScreen('scrProfile');setNav(this)"><div class="bn-icon">👤</div><div class="bn-label">Profile</div><div class="bn-dot"></div></div>
+  </div>
+  <div id="appToast" style="position:absolute;bottom:90px;left:16px;right:16px;z-index:300;background:rgba(17,17,24,0.96);border:1px solid #2a2a35;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;transform:translateY(60px);opacity:0;transition:all 0.3s;pointer-events:none;">
+    <span id="atIcon" style="font-size:18px;"></span><div><div id="atText" style="font-size:13px;font-weight:600;"></div><div id="atSub" style="font-size:11px;color:#444;"></div></div>
+  </div>
+</div>
+</div>
+<script>
+function goScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function setNav(el){document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+function openMapScreen(){goScreen('scrMap');setNav(document.querySelectorAll('.bn-item')[1]);startEta();startSpeed();}
+function doLogin(){const btn=document.getElementById('loginBtn');btn.innerHTML='<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,0.3);border-top-color:#000;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;vertical-align:middle;"></span>Signing in…';btn.disabled=true;setTimeout(()=>{goScreen('scrHome');document.getElementById('bottomNav').style.display='flex';startCountdown();buildWeekChart();},1400);}
+function doLogout(){document.getElementById('bottomNav').style.display='none';goScreen('scrLogin');document.getElementById('loginBtn').innerHTML='Get On The Road 🚀';document.getElementById('loginBtn').disabled=false;}
+let isOnline=true;
+function toggleOnline(){isOnline=!isOnline;const dot=document.getElementById('onlineDot');const label=document.getElementById('onlineLabel');const sub=document.getElementById('onlineSub');const sw=document.getElementById('onlineSwitch');if(isOnline){dot.className='ot-dot on';label.textContent="You're Online";sub.textContent='Receiving new orders';sw.className='ot-switch on';appToast('🟢','Now Online','You will receive new orders');}else{dot.className='ot-dot off';label.textContent="You're Offline";sub.textContent='Tap to go online';sw.className='ot-switch';appToast('⚫','Now Offline','No new orders will be assigned');}}
+let countdown=28;let cdInterval;
+function startCountdown(){countdown=28;clearInterval(cdInterval);cdInterval=setInterval(()=>{countdown--;const bar=document.getElementById('countdownBar');if(bar)bar.style.width=(countdown/28*100)+'%';const badge=document.querySelector('.noc-badge');if(badge){const sp=document.getElementById('cdSec');if(sp)sp.textContent=countdown;}if(countdown<=0){clearInterval(cdInterval);declineOrder();}},1000);}
+function acceptOrder(){clearInterval(cdInterval);document.getElementById('orderOverlay').classList.add('show');}
+function declineOrder(){clearInterval(cdInterval);const card=document.getElementById('newOrderCard');card.style.opacity='0.3';card.style.pointerEvents='none';appToast('⏭️','Order Declined','Assigned to next rider');setTimeout(()=>{card.style.opacity='1';card.style.pointerEvents='';countdown=28;startCountdown();appToast('🆕','New Order Incoming!','FabIndia → Rahul Mehta · ₹74');},3000);}
+function startNavigation(){document.getElementById('orderOverlay').classList.remove('show');document.getElementById('newOrderCard').style.display='none';document.getElementById('activeOrderCard').style.display='block';openMapScreen();}
+let etaMins=28;let etaInterval;
+function startEta(){clearInterval(etaInterval);etaMins=28;etaInterval=setInterval(()=>{if(etaMins>1){etaMins-=Math.random()>0.6?1:0;document.getElementById('etaChip').textContent=`ETA ${Math.round(etaMins)} min`;const km=(etaMins*0.12).toFixed(1);document.getElementById('enRouteLabel').textContent=`${km} km remaining · ${Math.round(etaMins)} min`;}},3000);}
+let speedInterval;
+function startSpeed(){clearInterval(speedInterval);speedInterval=setInterval(()=>{const spd=Math.round(28+(Math.random()-0.5)*16);document.getElementById('speedVal').textContent=Math.max(0,spd);},1500);}
+function markDelivered(){clearInterval(etaInterval);clearInterval(speedInterval);const step2=document.getElementById('step2');const step3=document.getElementById('step3');const btn=document.getElementById('deliverBtn');step2.className='mb-step done';step2.querySelector('.mb-step-check').textContent='✓';step2.querySelector('.mb-step-check').style.animation='none';step3.className='mb-step done';step3.querySelector('.mb-step-icon').className='mb-step-icon si-done';step3.querySelector('.mb-step-icon').textContent='✅';step3.querySelector('.mb-step-pending').outerHTML='<div class="mb-step-check" style="color:#00e676;">✓</div>';btn.textContent='🎉 Delivery Complete!';btn.style.background='#0d2318';btn.style.color='#00e676';btn.style.border='1px solid rgba(0,230,118,0.3)';btn.style.cursor='default';const prevEarn=parseInt(document.getElementById('todayEarnings').textContent.replace('₹','').replace(',',''));const newEarn=prevEarn+68;document.getElementById('todayEarnings').textContent='₹'+newEarn.toLocaleString('en-IN');document.getElementById('totalEarnings').textContent='₹'+newEarn.toLocaleString('en-IN');const trips=parseInt(document.getElementById('todayTrips').textContent);document.getElementById('todayTrips').textContent=trips+1;appToast('🎉','Delivered! +₹68','Customer rated you ⭐⭐⭐⭐⭐');}
+function buildWeekChart(){const vals=[920,880,840,0,0,0,0];const maxVal=1200;const container=document.getElementById('weekBars');if(!container)return;container.innerHTML=vals.map((v,i)=>`<div class="wc-bar ${i===2?'today':''}" style="height:${v>0?Math.max(12,Math.round(v/maxVal*76)):8}px;" title="₹${v||'—'}"></div>`).join('');}
+let toastTimer;
+function appToast(icon,text,sub){const el=document.getElementById('appToast');document.getElementById('atIcon').textContent=icon;document.getElementById('atText').textContent=text;document.getElementById('atSub').textContent=sub||'';el.style.transform='translateY(0)';el.style.opacity='1';clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.style.transform='translateY(60px)';el.style.opacity='0';},2800);}
+setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:false});},1000);
+const ks=document.createElement('style');ks.textContent='@keyframes spin{to{transform:rotate(360deg);}}';document.head.appendChild(ks);
+</script>
+</body>
+</html>
